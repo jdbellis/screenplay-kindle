@@ -382,7 +382,7 @@ function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
     character:    {size:fontSize,   bold:true, indentFrac:0.25, widthFrac:0.5,  r:0,  g:0,  b:0  },
     parenthetical:{size:fontSize-1,bold:false,indentFrac:0.30, widthFrac:0.4,  r:70, g:70, b:70 },
     dialogue:     {size:fontSize,   bold:false,indentFrac:0.20, widthFrac:0.6,  r:0,  g:0,  b:0  },
-    transition:   {size:fontSize-1,bold:false,indentFrac:0.60, widthFrac:0.4,  r:70, g:70, b:70 }, // Right aligned via high indent
+    transition:   {size:fontSize-1,bold:false,indentFrac:0.75, widthFrac:0.25, r:70, g:70, b:70 }, // Right aligned at full width edge
     action:       {size:fontSize,   bold:false,indentFrac:0,    widthFrac:1.0,  r:0,  g:0,  b:0  },
   };
 
@@ -397,11 +397,6 @@ function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
     doc.setFont('Courier',style.bold?'bold':'normal');
     doc.setTextColor(style.r,style.g,style.b);
     const lineH=style.size*lineSpacing;
-    
-    // For transitions, we want them right aligned. 
-    // The style indentFrac pushes them right, but we need to ensure text starts there.
-    // Actually, standard screenplay transitions are flush right. 
-    // If indentFrac is 0.6, and width is 0.4, it sits on the right side.
     
     for(const ln of doc.splitTextToSize(text,usableW)) {
       if(curY>pageH-mY) newPage();
