@@ -242,6 +242,37 @@ function setProg(pct){document.getElementById('prog').style.display='block';docu
 // ── Page sizes ───────────────────────────────────────────
 const PAGE_SIZES={kindle:[338,468],a5:[420,595],a4:[595,842]};
 
+// ── Line Grouping Helper ─────────────────────────────────
+function groupLines(items, vp) {
+  const sorted = items
+    .filter(i => i.str && i.str.trim())
+    .map(i => ({
+      str: i.str.trim(),
+      x: i.transform[4],
+      y: vp.height - i.transform[5],
+      pageW: vp.width
+    }))
+    .sort((a, b) => a.y - b.y || a.x - b.x);
+
+  const rows = [];
+  for (const item of sorted) {
+    const last = rows[rows.length - 1];
+    // Merge if on same line (Y diff < 7pt)
+    if (last && Math.abs(last.y - item.y) < 7) {
+      // Estimate horizontal gap. If significantly larger than expected char width, insert space.
+      const gap = item.x - last.x - (last.str.length * 6);
+      if (gap > 10) {
+        last.str += ' ' + item.str;
+      } else {
+        last.str += item.str;
+      }
+    } else {
+      rows.push({ ...item });
+    }
+  }
+  return rows;
+}
+
 // ── Classifier — uses normalised x (0–1) ─────────────────
 function classify(text, xNorm) {
   const t=text.trim();
@@ -249,9 +280,9 @@ function classify(text, xNorm) {
   const allCaps=t===t.toUpperCase()&&/[A-Z]/.test(t);
   if(allCaps&&/^(INT|EXT|INT\.\/EXT|EXT\.\/INT|I\/E)[\.\s\-]/.test(t)) return 'scene';
   if(allCaps&&/^(FADE (IN|OUT)|CUT TO|DISSOLVE TO|SMASH CUT|MATCH CUT|INTERCUT|TITLE CARD|THE END|OVER BLACK)/.test(t)) return 'transition';
-  if(allCaps&&t.length<50&&!t.includes('.')&&xNorm>0.25&&xNorm<0.75) return 'character';
-  if(t.startsWith('(')&&t.endsWith(')')&&xNorm>0.15) return 'parenthetical';
-  if(xNorm>0.12&&xNorm<0.75&&!allCaps) return 'dialogue';
+  if(allCaps&&t.length<50&&!t.includes('.')&&xNorm>0.20&&xNorm<0.80) return 'character';
+  if(t.startsWith('(')&&t.endsWith(')')&&xNorm>0.10) return 'parenthetical';
+  if(xNorm>0.10&&xNorm<0.80&&!allCaps) return 'dialogue';
   return 'action';
 }
 
@@ -265,18 +296,8 @@ async function extractText(pdf) {
     const page=await pdf.getPage(p);
     const vp=page.getViewport({scale:1});
     const tc=await page.getTextContent();
-    const items=tc.items
-      .filter(i=>i.str&&i.str.trim())
-      .map(i=>({str:i.str,x:i.transform[4],y:vp.height-i.transform[5],pageW:vp.width}))
-      .sort((a,b)=>a.y-b.y||a.x-b.x);
-    const rows=[];
-    for(const item of items) {
-      const last=rows[rows.length-1];
-      if(last&&Math.abs(last.y-item.y)<6){last.str+=item.str;}
-      else rows.push({...item});
-    }
-    lines.push(...rows);
-    lines.push({str:'',x:0,pageW:612});
+    lines.push(...groupLines(tc.items, vp));
+    lines.push({str:'',x:0,pageW:vp.width}); // page break
   }
   return lines;
 }
@@ -397,8 +418,21 @@ async function go() {
 
   try {
     logMsg('Loading PDF…'); setProg(2);
-    const pdf=await pdfjsLib.getDocument({data:await pdfFile.arrayBuffer()}).promise;
+    const arrayBuffer = await pdfFile.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
     const n=pdf.numPages;
+    
+    // Pre-flight check: detect scanned content early
+    const firstPage = await pdf.getPage(1);
+    const firstPageText = (await firstPage.getTextContent()).items.map(i => i.str).join('').trim();
+    if (firstPageText.length < 50 && !useOCR) {
+      logMsg('⚠️ This PDF appears to be scanned (image-based).', 'hi');
+      logMsg('Please enable "OCR mode" and click Convert again.', 'hi');
+      document.getElementById('s-ocr').checked = true;
+      btn.disabled = false;
+      return;
+    }
+
     logMsg('Found '+n+' page'+(n!==1?'s':'')+'.');
 
     let allLines=[];
@@ -414,12 +448,7 @@ async function go() {
           logMsg('Page '+p+'/'+n+' — text, extracting…');
           const vp=page.getViewport({scale:1});
           const tc=await page.getTextContent();
-          const items=tc.items.filter(i=>i.str&&i.str.trim())
-            .map(i=>({str:i.str,x:i.transform[4],y:vp.height-i.transform[5],pageW:vp.width}))
-            .sort((a,b)=>a.y-b.y||a.x-b.x);
-          const rows=[];
-          for(const item of items){const last=rows[rows.length-1];if(last&&Math.abs(last.y-item.y)<6){last.str+=item.str;}else rows.push({...item});}
-          allLines=allLines.concat(rows);
+          allLines=allLines.concat(groupLines(tc.items, vp));
         }
         allLines.push({str:'',x:0,pageW:612});
       }
