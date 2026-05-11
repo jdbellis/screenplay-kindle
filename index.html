@@ -22,27 +22,23 @@ body { background:var(--bg); color:var(--text); font-family:var(--sans); font-si
 h1 { font-family:var(--mono); font-size:20px; font-weight:400; letter-spacing:-0.02em; margin-bottom:4px; }
 h1 span { color:var(--accent); }
 .subtitle { font-size:12px; color:var(--muted); font-family:var(--mono); margin-bottom:36px; }
-
 .card { background:var(--bg2); border:1px solid var(--border); border-radius:6px; margin-bottom:16px; overflow:hidden; }
 .card-head { padding:10px 16px; border-bottom:1px solid var(--border); font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; display:flex; align-items:center; gap:8px; }
 .dot { width:7px; height:7px; border-radius:50%; background:var(--border2); flex-shrink:0; }
 .dot.ok { background:var(--success); } .dot.err { background:var(--danger); }
 .card-body { padding:14px 16px; }
-
 .row { display:flex; gap:8px; margin-bottom:8px; }
 .row:last-child { margin-bottom:0; }
-input[type=text], input[type=password] { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:12px; padding:7px 10px; outline:none; }
-input[type=text]:focus, input[type=password]:focus { border-color:var(--accent2); }
+input[type=text] { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:12px; padding:7px 10px; outline:none; }
+input[type=text]:focus { border-color:var(--accent2); }
 input::placeholder { color:var(--border2); }
 .note { font-size:11px; color:var(--muted); line-height:1.6; margin-top:8px; }
-
 .btn { background:var(--accent); color:#fff; border:none; border-radius:4px; padding:7px 14px; font-family:var(--mono); font-size:12px; font-weight:500; cursor:pointer; white-space:nowrap; transition:opacity .15s; }
 .btn:hover { opacity:.85; }
 .btn.outline { background:transparent; color:var(--accent); border:1px solid var(--accent2); }
 .btn.outline:hover { background:rgba(139,69,19,.06); }
 .btn.big { width:100%; padding:12px; font-size:13px; margin-bottom:10px; display:none; }
 .btn:disabled { opacity:.4; cursor:not-allowed; }
-
 .drop { border:1.5px dashed var(--border2); border-radius:6px; padding:36px 24px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s; margin-bottom:16px; }
 .drop:hover, .drop.over { border-color:var(--accent2); background:rgba(139,69,19,.03); }
 .drop input { display:none; }
@@ -50,38 +46,31 @@ input::placeholder { color:var(--border2); }
 .drop-title { font-family:var(--mono); font-size:13px; margin-bottom:3px; }
 .drop-sub { font-size:12px; color:var(--muted); }
 .chip { display:inline-flex; align-items:center; gap:6px; background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:3px 10px; margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--accent); }
-
 .opt { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; }
 .opt + .opt { border-top:1px solid var(--border); }
 .opt-lbl { font-size:13px; color:var(--muted); }
 .opt-lbl small { display:block; font-size:11px; color:var(--border2); margin-top:1px; }
 select { background:var(--bg3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:12px; padding:5px 8px; outline:none; cursor:pointer; }
-
 .sw { display:flex; align-items:center; gap:10px; }
 input[type=range] { -webkit-appearance:none; width:80px; height:2px; background:var(--border); border-radius:2px; outline:none; cursor:pointer; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--accent); cursor:pointer; }
 .sv { font-family:var(--mono); font-size:12px; color:var(--accent); min-width:28px; }
-
 .tog { position:relative; width:34px; height:20px; cursor:pointer; flex-shrink:0; }
 .tog input { display:none; }
 .tog-t { position:absolute; inset:0; background:var(--border); border-radius:10px; transition:background .2s; }
 .tog input:checked + .tog-t { background:var(--accent); }
 .tog-k { position:absolute; top:3px; left:3px; width:14px; height:14px; background:#fff; border-radius:50%; transition:left .2s; }
 .tog input:checked ~ .tog-k { left:17px; }
-
 .log { background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:12px 16px; margin-bottom:14px; display:none; min-height:48px; }
 .ll { font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9; }
 .ll.hi { color:var(--text); } .ll.ok { color:var(--success); } .ll.er { color:var(--danger); }
-
 .prog { height:3px; background:var(--border); border-radius:2px; margin-bottom:14px; display:none; overflow:hidden; }
 .prog-fill { height:100%; background:var(--accent); border-radius:2px; width:0%; transition:width .3s; }
-
 .hint { font-size:12px; color:var(--muted); text-align:center; margin-top:16px; line-height:1.7; font-family:var(--mono); }
 </style>
 </head>
 <body>
 <div class="wrap">
-
 <h1>screenplay<span> → </span>kindle</h1>
 <div class="subtitle">// pdf reformatter · text &amp; scanned</div>
 
@@ -97,7 +86,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; h
       <input type="text" id="lms-model" placeholder="vision model name, e.g. qwen2-vl-7b-instruct">
       <button class="btn outline" onclick="listModels()" style="font-size:11px">List</button>
     </div>
-    <div class="note">LM Studio → Local Server → load a <strong>vision model</strong> (Qwen2-VL recommended) → Start Server.<br>Text PDFs convert with no server needed.</div>
+    <div class="note">LM Studio → Local Server → load a <strong>vision model</strong> (Qwen2-VL recommended) → Start Server.<br>Text PDFs work with no server needed.</div>
   </div>
 </div>
 
@@ -147,17 +136,14 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; h
   <div class="ll" id="l3"></div>
 </div>
 <div class="prog" id="prog"><div class="prog-fill" id="prog-fill"></div></div>
-
 <button class="btn big" id="go-btn" onclick="go()">Convert for Kindle</button>
 <button class="btn big outline" id="dl-btn" style="display:none">⬇ Download PDF</button>
-
 <div class="hint">Send to Kindle via email (yourname@kindle.com) or drag into the Kindle app.</div>
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-let pdfFile = null, outBlob = null;
+let pdfFile=null, outBlob=null;
 
 // ── Config ───────────────────────────────────────────────
 function loadConfig() {
@@ -172,34 +158,30 @@ function saveConfig() {
 }
 function lmsUrl()   { return (document.getElementById('lms-url').value.trim()||'http://localhost:1234').replace(/\/$/,''); }
 function lmsModel() { return document.getElementById('lms-model').value.trim()||localStorage.getItem('lms_model')||''; }
-function setDot(cls,msg) {
-  document.getElementById('dot').className = 'dot'+(cls?' '+cls:'');
-  document.getElementById('dot-lbl').textContent = msg;
-}
+function setDot(cls,msg) { document.getElementById('dot').className='dot'+(cls?' '+cls:''); document.getElementById('dot-lbl').textContent=msg; }
 async function testConn() {
   setDot(null,'Testing…');
   try {
-    const r = await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    const d = await r.json();
-    const names = (d.data||[]).map(m=>m.id).join(', ')||'(no models loaded)';
-    setDot('ok','Connected ✓  '+names.slice(0,55));
+    const r=await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    setDot('ok','Connected ✓  '+((d.data||[]).map(m=>m.id).join(', ')||'(no models)').slice(0,55));
   } catch(e) { setDot('err','Cannot reach LM Studio: '+e.message); }
 }
 async function listModels() {
   try {
-    const r = await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
-    const d = await r.json();
-    const ids = (d.data||[]).map(m=>m.id);
-    if (!ids.length){alert('No models loaded in LM Studio.');return;}
-    const pick = ids.length===1?ids[0]:prompt('Pick a vision model:\n\n'+ids.join('\n'),ids[0]);
-    if (pick){document.getElementById('lms-model').value=pick;saveConfig();}
+    const r=await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    const ids=(d.data||[]).map(m=>m.id);
+    if(!ids.length){alert('No models loaded.');return;}
+    const pick=ids.length===1?ids[0]:prompt('Pick a vision model:\n\n'+ids.join('\n'),ids[0]);
+    if(pick){document.getElementById('lms-model').value=pick;saveConfig();}
   } catch(e){alert('Could not reach LM Studio at '+lmsUrl());}
 }
 loadConfig();
 
 // ── File drop ────────────────────────────────────────────
-const drop=document.getElementById('drop'), fi=document.getElementById('fi');
+const drop=document.getElementById('drop'),fi=document.getElementById('fi');
 drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
 drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
 drop.addEventListener('drop',e=>{
@@ -208,9 +190,7 @@ drop.addEventListener('drop',e=>{
   if(f&&f.type==='application/pdf') setFile(f); else logMsg('Please drop a PDF.','er');
 });
 fi.addEventListener('change',()=>{if(fi.files[0])setFile(fi.files[0]);});
-document.getElementById('s-size').addEventListener('input',function(){
-  document.getElementById('s-size-v').textContent=this.value+'pt';
-});
+document.getElementById('s-size').addEventListener('input',function(){ document.getElementById('s-size-v').textContent=this.value+'pt'; });
 function setFile(f) {
   pdfFile=f; outBlob=null;
   document.getElementById('chip').style.display='inline-flex';
@@ -239,31 +219,154 @@ function logMsg(msg,cls) {
 }
 function setProg(pct){document.getElementById('prog').style.display='block';document.getElementById('prog-fill').style.width=pct+'%';}
 
-// ── Page sizes ───────────────────────────────────────────
 const PAGE_SIZES={kindle:[338,468],a5:[420,595],a4:[595,842]};
 
-// ── Line Grouping Helper ─────────────────────────────────
-function groupLines(items, vp) {
+// ── CHARACTER NAME PATTERN ────────────────────────────────
+// Matches: NAME, NAME (V.O.), NAME (O.S.), NAME (CONT'D), etc.
+// Must be ALL CAPS, 1-4 words, optionally followed by parenthetical qualifier
+const CHAR_PAT = /^([A-Z][A-Z0-9 '']{0,30})(\s*\([^)]{1,30}\))?$/;
+
+// Scene heading patterns
+const SCENE_PAT = /^(\d+\s+)?(INT|EXT|I\/E|EXT\/INT|INT\.\/EXT\.|COLD OPEN|ACT (ONE|TWO|THREE|FOUR|FIVE|\d)|FADE IN|TAG|TEASER|EPILOGUE)/;
+
+// Transition patterns  
+const TRANS_PAT = /^(FADE OUT|FADE IN|CUT TO|DISSOLVE TO|SMASH CUT|MATCH CUT|WIPE TO|INTERCUT|THE END|BACK TO|TITLE CARD|WHIP PAN)\b/;
+
+// ── SEGMENT SPLITTER ──────────────────────────────────────
+// This is the key function for scripts like Good Boy where action
+// and character names are concatenated on the same extracted line.
+// e.g. "CLARENCE I can speak. DRIVER Cool, get out of my van."
+// We split this into: ["CLARENCE", "I can speak.", "DRIVER", "Cool, get out of my van."]
+
+function splitSegments(rawLine) {
+  // First check if the whole line is a special type — if so, don't split
+  const t = rawLine.trim();
+  if (!t) return [{ text: '', hint: 'blank' }];
+  if (SCENE_PAT.test(t)) return [{ text: t, hint: 'scene' }];
+  if (TRANS_PAT.test(t)) return [{ text: t, hint: 'transition' }];
+  if (t.startsWith('(') && t.endsWith(')')) return [{ text: t, hint: 'parenthetical' }];
+
+  // Tokenise on boundaries before ALL-CAPS words that look like character names.
+  // Strategy: scan word by word, when we see a run of ALL-CAPS words that match
+  // the character name pattern AND are followed by lowercase text, that's a split point.
+  const words = t.split(/\s+/);
+  const segments = [];
+  let i = 0;
+
+  while (i < words.length) {
+    // Try to grab a character name starting at position i
+    // Character names are 1–4 consecutive all-caps words
+    let nameFound = false;
+    for (let nameLen = 4; nameLen >= 1; nameLen--) {
+      if (i + nameLen > words.length) continue;
+      const candidate = words.slice(i, i + nameLen).join(' ');
+      if (!CHAR_PAT.test(candidate)) continue;
+      // Check what follows: if nothing, or next word is lowercase/mixed, it's a name
+      const nextIdx = i + nameLen;
+      // Optionally consume a trailing parenthetical like (V.O.) or (CONT'D)
+      let nameStr = candidate;
+      let consumedExtra = 0;
+      if (nextIdx < words.length && words[nextIdx].startsWith('(')) {
+        // find closing paren
+        let parenBuf = '';
+        let j = nextIdx;
+        while (j < words.length) {
+          parenBuf += (parenBuf ? ' ' : '') + words[j];
+          j++;
+          if (words[j-1].endsWith(')')) break;
+        }
+        nameStr = candidate + ' ' + parenBuf;
+        consumedExtra = j - nextIdx;
+      }
+      const afterName = i + nameLen + consumedExtra;
+      // Accept as character name if:
+      // - it's the whole remaining text (standalone name line), OR
+      // - the next word starts with a non-caps letter (dialogue follows), OR
+      // - afterName is at end
+      if (afterName >= words.length) {
+        segments.push({ text: nameStr, hint: 'character' });
+        i = afterName;
+        nameFound = true;
+        break;
+      }
+      const nextWord = words[afterName];
+      const nextIsLower = /^[a-z"'(\[]/.test(nextWord);
+      const nextIsCaps = nextWord === nextWord.toUpperCase() && /[A-Z]/.test(nextWord);
+      // If the next word is lowercase/mixed, this is a character name followed by dialogue
+      if (nextIsLower) {
+        segments.push({ text: nameStr, hint: 'character' });
+        i = afterName;
+        nameFound = true;
+        break;
+      }
+      // If next word is all-caps too, don't treat this as a character name yet —
+      // could be part of an action line or a scene heading
+    }
+
+    if (!nameFound) {
+      // Consume words until we hit what looks like another character name boundary
+      // Collect into an action/dialogue run
+      let run = [];
+      while (i < words.length) {
+        // Look ahead: is there a character name break coming?
+        let foundBreak = false;
+        for (let nameLen = 4; nameLen >= 1; nameLen--) {
+          if (i + nameLen > words.length) continue;
+          const candidate = words.slice(i, i + nameLen).join(' ');
+          if (!CHAR_PAT.test(candidate)) continue;
+          const afterIdx = i + nameLen;
+          if (afterIdx >= words.length) break; // end of line, not a mid-line break
+          const nextWord = words[afterIdx];
+          const nextIsLower = /^[a-z"'(\[]/.test(nextWord);
+          if (nextIsLower) {
+            // This is a mid-line character name break — stop the run here
+            foundBreak = true;
+            break;
+          }
+        }
+        if (foundBreak) break;
+        run.push(words[i]);
+        i++;
+      }
+      if (run.length) {
+        segments.push({ text: run.join(' '), hint: 'action' });
+      }
+    }
+  }
+
+  return segments.length ? segments : [{ text: t, hint: 'action' }];
+}
+
+// ── CLASSIFY a segment ───────────────────────────────────
+// Uses the hint from the splitter + context state
+// state: 'action' | 'character' | 'dialogue' | 'parenthetical'
+function classifySegment(seg, state) {
+  if (seg.hint === 'blank')         return 'blank';
+  if (seg.hint === 'scene')         return 'scene';
+  if (seg.hint === 'transition')    return 'transition';
+  if (seg.hint === 'parenthetical') return 'parenthetical';
+  if (seg.hint === 'character')     return 'character';
+
+  // For 'action' hints: use state to decide if it's actually dialogue
+  // If last real element was character or parenthetical, this is dialogue
+  if (state === 'character' || state === 'parenthetical' || state === 'dialogue') {
+    // It's dialogue — unless it looks like a stage direction mixed in
+    return 'dialogue';
+  }
+  return 'action';
+}
+
+// ── GROUP PDF TEXT ITEMS INTO VISUAL LINES ───────────────
+function groupRawLines(items, vp) {
   const sorted = items
     .filter(i => i.str && i.str.trim())
-    .map(i => ({
-      str: i.str.trim(),
-      x: i.transform[4],
-      y: vp.height - i.transform[5],
-      pageW: vp.width
-    }))
-    .sort((a, b) => a.y - b.y || a.x - b.x);
-
+    .map(i => ({ str: i.str, x: i.transform[4], y: vp.height - i.transform[5], pageW: vp.width }))
+    .sort((a,b) => a.y - b.y || a.x - b.x);
   const rows = [];
   for (const item of sorted) {
     const last = rows[rows.length - 1];
     if (last && Math.abs(last.y - item.y) < 7) {
-      const gap = item.x - last.x - (last.str.length * 6);
-      if (gap > 10) {
-        last.str += ' ' + item.str;
-      } else {
-        last.str += item.str;
-      }
+      last.str += item.str;
     } else {
       rows.push({ ...item });
     }
@@ -271,278 +374,260 @@ function groupLines(items, vp) {
   return rows;
 }
 
-// ── Classifier — uses normalised x (0–1) ─────────────────
-function classify(text, xNorm) {
-  const t=text.trim();
-  if(!t) return 'blank';
-  
-  // 1. Remove brackets/notes
-  const clean = t.replace(/\[\[.*?\]\]/g, '').trim();
-  if(!clean) return 'blank';
-  
-  const allCaps = clean === clean.toUpperCase() && /[A-Z]/.test(clean);
-  
-  // 2. Transitions (All caps, ends in colon) -> CUT TO:, FADE OUT:
-  if(allCaps && clean.endsWith(':')) return 'transition';
-  
-  // 3. Scene Headers (Standard + Acts + Cold Open)
-  // Strip leading scene numbers (e.g. "2 INT...") for detection, but keep text for now
-  const sceneRegex = /^(INT|EXT|I\/E|COLD OPEN|ACT (ONE|TWO|THREE|FOUR|FIVE)|TITLE CARD)/;
-  if(allCaps && sceneRegex.test(clean)) return 'scene';
-  
-  // 4. Character Names
-  // Must be all caps, reasonable length, no punctuation at end (except O.S/V.O which are usually in parens)
-  // Indentation check helps distinguish from action
-  if(allCaps && clean.length < 40 && !/[.!?]/.test(clean) && xNorm > 0.15 && xNorm < 0.80) return 'character';
-  
-  // 5. Parentheticals
-  if(clean.startsWith('(') && clean.endsWith(')') && xNorm > 0.10) return 'parenthetical';
-  
-  // 6. Dialogue vs Action
-  // If indented, it's dialogue (even if all caps shouting)
-  // If flush left, it's action
-  if(xNorm > 0.12) return 'dialogue';
-  
-  return 'action';
-}
+// ── PARSE LINES INTO TYPED BLOCKS ───────────────────────
+// Takes raw extracted rows and returns [{type, text}]
+function parseIntoBlocks(rawLines) {
+  const blocks = [];
+  let state = 'action'; // tracks what we last emitted
 
-// ── Extract text PDF ─────────────────────────────────────
-async function extractText(pdf) {
-  const lines=[];
-  const n=pdf.numPages;
-  for(let p=1;p<=n;p++) {
-    logMsg('Reading page '+p+' / '+n);
-    setProg(5+(p/n)*40);
-    const page=await pdf.getPage(p);
-    const vp=page.getViewport({scale:1});
-    const tc=await page.getTextContent();
-    lines.push(...groupLines(tc.items, vp));
-    lines.push({str:'',x:0,pageW:vp.width});
+  for (const row of rawLines) {
+    const t = (row.str || '').trim();
+
+    // Blank / page break
+    if (!t) {
+      blocks.push({ type: 'blank', text: '' });
+      continue;
+    }
+
+    // Skip lone page numbers
+    if (/^\d+$/.test(t)) continue;
+
+    // Split the line into segments
+    const segs = splitSegments(t);
+
+    for (const seg of segs) {
+      if (!seg.text.trim()) continue;
+      const type = classifySegment(seg, state);
+      if (type === 'blank') { blocks.push({ type: 'blank', text: '' }); continue; }
+
+      // Merge consecutive blocks of the same type (except blanks/scenes)
+      const last = blocks[blocks.length - 1];
+      if (last && last.type === type && type !== 'scene' && type !== 'transition' && type !== 'character') {
+        last.text += ' ' + seg.text;
+      } else {
+        blocks.push({ type, text: seg.text });
+      }
+
+      if (type !== 'blank') state = type;
+    }
   }
-  return lines;
+
+  return blocks;
 }
 
-// ── Scanned page detection ───────────────────────────────
+// ── Extract text from text-based PDF ────────────────────
+async function extractText(pdf) {
+  const allRows = [];
+  const n = pdf.numPages;
+  for (let p = 1; p <= n; p++) {
+    logMsg('Reading page ' + p + ' / ' + n);
+    setProg(5 + (p/n) * 40);
+    const page = await pdf.getPage(p);
+    const vp   = page.getViewport({ scale: 1 });
+    const tc   = await page.getTextContent();
+    allRows.push(...groupRawLines(tc.items, vp));
+    allRows.push({ str: '', x: 0, pageW: vp.width }); // page gap
+  }
+  return allRows;
+}
+
+// ── Scanned detection ────────────────────────────────────
 async function isScanned(page) {
-  const tc=await page.getTextContent();
-  return tc.items.map(i=>i.str).join('').trim().length<30;
+  const tc = await page.getTextContent();
+  return tc.items.map(i=>i.str).join('').trim().length < 30;
 }
 
 // ── Page → image ─────────────────────────────────────────
 async function pageToImg(page) {
-  const vp=page.getViewport({scale:2});
-  const c=document.createElement('canvas');
-  c.width=vp.width; c.height=vp.height;
-  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
-  return c.toDataURL('image/jpeg',0.92);
+  const vp = page.getViewport({ scale: 2 });
+  const c  = document.createElement('canvas');
+  c.width = vp.width; c.height = vp.height;
+  await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+  return c.toDataURL('image/jpeg', 0.92);
 }
 
 // ── OCR via LM Studio ────────────────────────────────────
-async function ocrPage(imgUrl,p,n) {
-  logMsg('OCR page '+p+' / '+n+'…');
-  const model=lmsModel();
-  if(!model) throw new Error('No vision model set — enter one in the LM Studio section above.');
-  const res=await fetch(lmsUrl()+'/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model,max_tokens:2048,temperature:0,
-      messages:[{role:'user',content:[
-        {type:'image_url',image_url:{url:imgUrl}},
-        {type:'text',text:'You are a screenplay OCR engine. Transcribe this screenplay page exactly.\nRules:\n- Output ONLY the text. No commentary, no markdown, no code fences.\n- Preserve ALL line breaks exactly as they appear.\n- Preserve indentation using spaces (scene headings flush left, character names centred, dialogue indented).\n- Do not merge or split lines.\n- Do not add or remove any words.'}
+async function ocrPage(imgUrl, p, n) {
+  logMsg('OCR page ' + p + ' / ' + n + '…');
+  const model = lmsModel();
+  if (!model) throw new Error('No vision model set — enter one above.');
+  const res = await fetch(lmsUrl() + '/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model, max_tokens: 2048, temperature: 0,
+      messages: [{ role: 'user', content: [
+        { type: 'image_url', image_url: { url: imgUrl } },
+        { type: 'text', text: 'You are a screenplay OCR engine. Transcribe this screenplay page exactly.\nRules:\n- Output ONLY the text. No commentary, no markdown, no code fences.\n- Preserve ALL line breaks exactly as they appear.\n- Preserve indentation using spaces.\n- Do not add or remove any words.' }
       ]}]
     })
   });
-  if(!res.ok){const e=await res.text();throw new Error('LM Studio '+res.status+': '+e.slice(0,150));}
-  const data=await res.json();
-  return data.choices[0].message.content;
+  if (!res.ok) { const e = await res.text(); throw new Error('LM Studio ' + res.status + ': ' + e.slice(0,150)); }
+  return (await res.json()).choices[0].message.content;
 }
 
-// ── Parse OCR text → lines ───────────────────────────────
+// ── Parse OCR text → rows ────────────────────────────────
 function parseOcr(text) {
-  return text.split('\n').map(raw=>{
-    const t=raw.trimEnd();
-    if(!t.trim()) return {str:'',x:0,pageW:612};
-    const spaces=t.length-t.trimStart().length;
-    return {str:t.trimStart(),x:spaces*7.2,pageW:612};
+  return text.split('\n').map(raw => {
+    const t = raw.trimEnd();
+    if (!t.trim()) return { str: '', x: 0, pageW: 612 };
+    const spaces = t.length - t.trimStart().length;
+    return { str: t.trimStart(), x: spaces * 7.2, pageW: 612 };
   });
 }
 
-// ── Build PDF ────────────────────────────────────────────
-function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
-  const [pageW,pageH]=PAGE_SIZES[pageSizeKey];
-  const mX=pageSizeKey==='kindle'?24:42, mY=pageSizeKey==='kindle'?28:48;
-  const cW=pageW-mX*2;
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({unit:'pt',format:[pageW,pageH]});
+// ── Build output PDF ─────────────────────────────────────
+function buildPDF(blocks, fontSize, pageSizeKey, lineSpacing) {
+  const [pageW, pageH] = PAGE_SIZES[pageSizeKey];
+  const mX = pageSizeKey === 'kindle' ? 24 : 42;
+  const mY = pageSizeKey === 'kindle' ? 28 : 48;
+  const cW = pageW - mX * 2;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: [pageW, pageH] });
 
-  // Styles: Action full width, Dialogue narrower/indented
-  const styles={
-    scene:        {size:fontSize,   bold:true, indentFrac:0,    widthFrac:1.0,  r:0,  g:0,  b:0  },
-    character:    {size:fontSize,   bold:true, indentFrac:0.25, widthFrac:0.5,  r:0,  g:0,  b:0  },
-    parenthetical:{size:fontSize-1,bold:false,indentFrac:0.30, widthFrac:0.4,  r:70, g:70, b:70 },
-    dialogue:     {size:fontSize,   bold:false,indentFrac:0.20, widthFrac:0.6,  r:0,  g:0,  b:0  },
-    transition:   {size:fontSize-1,bold:false,indentFrac:0.75, widthFrac:0.25, r:70, g:70, b:70 }, // Right aligned at full width edge
-    action:       {size:fontSize,   bold:false,indentFrac:0,    widthFrac:1.0,  r:0,  g:0,  b:0  },
+  // Standard screenplay proportions, scaled to our page width
+  // Action: full width, flush left
+  // Character: centred (starts at ~37% in)
+  // Dialogue: starts at ~20%, ends at ~80% (60% wide)
+  // Parenthetical: starts at ~30%, ends at ~70%
+  // Transition: right-aligned
+  const ST = {
+    scene:        { size: fontSize,    bold: true,  x: 0,        w: cW,        align: 'left'  },
+    character:    { size: fontSize,    bold: true,  x: cW*0.30,  w: cW*0.40,   align: 'left'  },
+    parenthetical:{ size: fontSize-1, bold: false, x: cW*0.22,  w: cW*0.36,   align: 'left',  r:80,g:80,b:80 },
+    dialogue:     { size: fontSize,    bold: false, x: cW*0.15,  w: cW*0.70,   align: 'left'  },
+    transition:   { size: fontSize-1, bold: false, x: 0,        w: cW,        align: 'right', r:80,g:80,b:80 },
+    action:       { size: fontSize,    bold: false, x: 0,        w: cW,        align: 'left'  },
   };
 
-  let curY=mY+fontSize;
-  function newPage(){doc.addPage();curY=mY+fontSize;}
-  
-  function putText(text,style) {
-    const indent=cW*style.indentFrac;
-    const usableW=cW*style.widthFrac;
-    
-    doc.setFontSize(style.size);
-    doc.setFont('Courier',style.bold?'bold':'normal');
-    doc.setTextColor(style.r,style.g,style.b);
-    const lineH=style.size*lineSpacing;
-    
-    for(const ln of doc.splitTextToSize(text,usableW)) {
-      if(curY>pageH-mY) newPage();
-      doc.text(ln, mX+indent, curY);
-      curY+=lineH;
+  let curY = mY + fontSize;
+  function newPage() { doc.addPage(); curY = mY + fontSize; }
+
+  function putBlock(text, type) {
+    const s = ST[type] || ST.action;
+    doc.setFontSize(s.size);
+    doc.setFont('Courier', s.bold ? 'bold' : 'normal');
+    doc.setTextColor(s.r||0, s.g||0, s.b||0);
+    const lineH = s.size * lineSpacing;
+    const wrapped = doc.splitTextToSize(text, s.w);
+    for (const ln of wrapped) {
+      if (curY > pageH - mY) newPage();
+      const x = s.align === 'right' ? mX + cW - doc.getTextWidth(ln) : mX + s.x;
+      doc.text(ln, x, curY);
+      curY += lineH;
     }
   }
 
-  let lastType=null;
-  let currentType=null;
-  let currentText='';
+  let lastType = null;
+  let blankCount = 0;
 
-  function flush() {
-    if(currentText) {
-      putText(currentText, styles[currentType]);
-      currentText = '';
-    }
-  }
+  for (const block of blocks) {
+    const { type, text } = block;
 
-  for(const line of lines) {
-    let raw=(line.str||'').trim();
-    
-    // Remove PDF artifacts
-    raw = raw.replace(/\[\[.*?\]\]/g, '').trim();
-    
-    if(!raw) {
-      flush();
-      if(lastType && lastType !== 'blank') curY += fontSize * 0.5;
-      lastType = 'blank';
-      currentType = null;
+    if (type === 'blank') {
+      blankCount++;
+      // Only add vertical space for first blank after content
+      if (blankCount === 1 && lastType && lastType !== 'blank') {
+        curY += fontSize * 0.4;
+      }
       continue;
     }
+    blankCount = 0;
 
-    // Skip standalone page numbers
-    if(/^\d+\.?$/.test(raw)) continue;
-
-    const xNorm=line.pageW>0?line.x/line.pageW:0;
-    const type=smartFormat?classify(raw,xNorm):'action';
-
-    // Strip leading scene numbers (e.g. "2 INT...")
-    if(type==='scene') {
-      raw = raw.replace(/^\d+\s+/, '');
+    // Pre-block spacing
+    if (lastType !== null && lastType !== 'blank') {
+      if (type === 'scene') {
+        curY += fontSize * 1.8; // big gap before scene headings
+      } else if (type === 'character' && (lastType === 'action' || lastType === 'transition' || lastType === 'scene')) {
+        curY += fontSize * 1.0; // gap before character names when coming from action
+      } else if (type === 'action' && (lastType === 'dialogue' || lastType === 'parenthetical')) {
+        curY += fontSize * 0.6; // gap after dialogue block ends
+      } else if (type === 'transition') {
+        curY += fontSize * 0.8;
+      }
+      // No extra gap between character→dialogue, dialogue→parenthetical, parenthetical→dialogue
     }
 
-    if(type === currentType) {
-      // Group consecutive lines of the same type
-      currentText += ' ' + raw;
-    } else {
-      flush();
-      
-      // Spacing Logic
-      // 1. Scene headers get big gap
-      if(type==='scene' && lastType && lastType !== 'blank') curY += fontSize * 1.5;
-      
-      // 2. Character names get gap if coming from action/dialogue
-      else if(type==='character' && (lastType==='action' || lastType==='dialogue' || lastType==='transition')) curY += fontSize * 1.0;
-      
-      // 3. Dialogue gets gap ONLY if coming from Action or Transition (new block)
-      // NO GAP if coming from Character or Parenthetical (immediate response)
-      else if(type==='dialogue' && (lastType==='action' || lastType==='transition')) curY += fontSize * 0.8;
-      
-      // 4. Default small gap for other transitions
-      else if(lastType && lastType !== 'blank') curY += fontSize * 0.2;
-
-      currentType = type;
-      currentText = raw;
-      lastType = type;
-    }
+    if (text.trim()) putBlock(text.trim(), type);
+    lastType = type;
   }
-  flush();
+
   return doc;
 }
 
-// ── Go ───────────────────────────────────────────────────
+// ── Main ─────────────────────────────────────────────────
 async function go() {
-  if(!pdfFile) return;
-  const btn=document.getElementById('go-btn');
-  btn.disabled=true;
-  document.getElementById('dl-btn').style.display='none';
+  if (!pdfFile) return;
+  const btn = document.getElementById('go-btn');
+  btn.disabled = true;
+  document.getElementById('dl-btn').style.display = 'none';
   clearLog();
 
-  const fontSize    =parseInt(document.getElementById('s-size').value);
-  const pageSizeKey =document.getElementById('s-page').value;
-  const lineSpacing =parseFloat(document.getElementById('s-space').value);
-  const smartFormat =document.getElementById('s-smart').checked;
-  const useOCR      =document.getElementById('s-ocr').checked;
+  const fontSize    = parseInt(document.getElementById('s-size').value);
+  const pageSizeKey = document.getElementById('s-page').value;
+  const lineSpacing = parseFloat(document.getElementById('s-space').value);
+  const smartFormat = document.getElementById('s-smart').checked;
+  const useOCR      = document.getElementById('s-ocr').checked;
 
   try {
     logMsg('Loading PDF…'); setProg(2);
-    const arrayBuffer = await pdfFile.arrayBuffer();
-    const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
-    const n=pdf.numPages;
-    
-    const firstPage = await pdf.getPage(1);
-    const firstPageText = (await firstPage.getTextContent()).items.map(i => i.str).join('').trim();
-    if (firstPageText.length < 50 && !useOCR) {
-      logMsg('⚠️ This PDF appears to be scanned (image-based).', 'hi');
-      logMsg('Please enable "OCR mode" and click Convert again.', 'hi');
+    const pdf = await pdfjsLib.getDocument({ data: await pdfFile.arrayBuffer() }).promise;
+    const n   = pdf.numPages;
+
+    // Quick scanned check
+    const p1 = await pdf.getPage(1);
+    if ((await p1.getTextContent()).items.map(i=>i.str).join('').trim().length < 50 && !useOCR) {
+      logMsg('This looks like a scanned PDF — enable OCR mode and try again.', 'hi');
       document.getElementById('s-ocr').checked = true;
       btn.disabled = false;
       return;
     }
 
-    logMsg('Found '+n+' page'+(n!==1?'s':'')+'.');
+    logMsg('Found ' + n + ' page' + (n!==1?'s':'') + '.');
+    let allRows = [];
 
-    let allLines=[];
-
-    if(useOCR) {
-      if(!lmsModel()) throw new Error('No vision model set — enter one above.');
-      for(let p=1;p<=n;p++) {
-        setProg(5+(p/n)*82);
-        const page=await pdf.getPage(p);
-        if(await isScanned(page)) {
-          allLines=allLines.concat(parseOcr(await ocrPage(await pageToImg(page),p,n)));
+    if (useOCR) {
+      if (!lmsModel()) throw new Error('No vision model set — enter one above.');
+      for (let p = 1; p <= n; p++) {
+        setProg(5 + (p/n)*82);
+        const page = await pdf.getPage(p);
+        if (await isScanned(page)) {
+          allRows = allRows.concat(parseOcr(await ocrPage(await pageToImg(page), p, n)));
         } else {
-          logMsg('Page '+p+'/'+n+' — text, extracting…');
-          const vp=page.getViewport({scale:1});
-          const tc=await page.getTextContent();
-          allLines=allLines.concat(groupLines(tc.items, vp));
+          logMsg('Page ' + p + '/' + n + ' — text…');
+          const vp = page.getViewport({ scale: 1 });
+          const tc = await page.getTextContent();
+          allRows = allRows.concat(groupRawLines(tc.items, vp));
         }
-        allLines.push({str:'',x:0,pageW:612});
+        allRows.push({ str: '', x: 0, pageW: 612 });
       }
     } else {
-      allLines=await extractText(pdf);
+      allRows = await extractText(pdf);
     }
 
-    logMsg('Building PDF…'); setProg(92);
-    const doc=buildPDF(allLines,fontSize,pageSizeKey,lineSpacing,smartFormat);
-    outBlob=doc.output('blob');
-    const name=pdfFile.name.replace(/\.pdf$/i,'')+'_kindle.pdf';
+    logMsg('Parsing structure…'); setProg(88);
+    const blocks = smartFormat ? parseIntoBlocks(allRows) : allRows.map(r => ({ type: r.str.trim() ? 'action' : 'blank', text: r.str.trim() }));
 
-    const dlBtn=document.getElementById('dl-btn');
-    dlBtn.style.display='block';
-    dlBtn.textContent='⬇  Download — '+name;
-    dlBtn.onclick=()=>{
-      const url=URL.createObjectURL(outBlob);
-      const a=document.createElement('a');
-      a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+    logMsg('Building PDF…'); setProg(93);
+    const doc  = buildPDF(blocks, fontSize, pageSizeKey, lineSpacing);
+    outBlob    = doc.output('blob');
+    const name = pdfFile.name.replace(/\.pdf$/i, '') + '_kindle.pdf';
+
+    const dlBtn = document.getElementById('dl-btn');
+    dlBtn.style.display = 'block';
+    dlBtn.textContent   = '⬇  Download — ' + name;
+    dlBtn.onclick = () => {
+      const url = URL.createObjectURL(outBlob);
+      const a = document.createElement('a'); a.href=url; a.download=name; a.click();
+      URL.revokeObjectURL(url);
     };
     setProg(100);
-    logMsg('Done — '+doc.getNumberOfPages()+' pages.',  'ok');
+    logMsg('Done — ' + doc.getNumberOfPages() + ' pages.', 'ok');
   } catch(err) {
-    logMsg(err.message,'er');
+    logMsg(err.message, 'er');
     console.error(err);
   }
-  btn.disabled=false;
+  btn.disabled = false;
 }
 </script>
 </body>
