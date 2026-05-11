@@ -257,9 +257,7 @@ function groupLines(items, vp) {
   const rows = [];
   for (const item of sorted) {
     const last = rows[rows.length - 1];
-    // Merge if on same line (Y diff < 7pt)
     if (last && Math.abs(last.y - item.y) < 7) {
-      // Estimate horizontal gap. If significantly larger than expected char width, insert space.
       const gap = item.x - last.x - (last.str.length * 6);
       if (gap > 10) {
         last.str += ' ' + item.str;
@@ -277,12 +275,17 @@ function groupLines(items, vp) {
 function classify(text, xNorm) {
   const t=text.trim();
   if(!t) return 'blank';
-  const allCaps=t===t.toUpperCase()&&/[A-Z]/.test(t);
-  if(allCaps&&/^(INT|EXT|INT\.\/EXT|EXT\.\/INT|I\/E)[\.\s\-]/.test(t)) return 'scene';
-  if(allCaps&&/^(FADE (IN|OUT)|CUT TO|DISSOLVE TO|SMASH CUT|MATCH CUT|INTERCUT|TITLE CARD|THE END|OVER BLACK)/.test(t)) return 'transition';
-  if(allCaps&&t.length<50&&!t.includes('.')&&xNorm>0.20&&xNorm<0.80) return 'character';
-  if(t.startsWith('(')&&t.endsWith(')')&&xNorm>0.10) return 'parenthetical';
-  if(xNorm>0.10&&xNorm<0.80&&!allCaps) return 'dialogue';
+  const clean = t.replace(/\[\[.*?\]\]/g, '').trim();
+  if(!clean) return 'blank';
+  
+  const allCaps = clean === clean.toUpperCase() && /[A-Z]/.test(clean);
+  
+  if(allCaps && /^(INT|EXT|INT\.\/EXT|EXT\.\/INT|I\/E)[\.\s\-]/.test(clean)) return 'scene';
+  if(allCaps && /^(FADE (IN|OUT)|CUT TO|DISSOLVE TO|SMASH CUT|MATCH CUT|INTERCUT|TITLE CARD|THE END|OVER BLACK)/.test(clean)) return 'transition';
+  // Character name (allows parentheses for (O.S.), (V.O.), (CONT'D), ages, etc.)
+  if(allCaps && clean.length < 50 && !/^\d+$/.test(clean) && xNorm > 0.15 && xNorm < 0.80) return 'character';
+  if(clean.startsWith('(') && clean.endsWith(')') && xNorm > 0.10) return 'parenthetical';
+  if(xNorm > 0.10 && xNorm < 0.80 && !allCaps) return 'dialogue';
   return 'action';
 }
 
@@ -297,7 +300,7 @@ async function extractText(pdf) {
     const vp=page.getViewport({scale:1});
     const tc=await page.getTextContent();
     lines.push(...groupLines(tc.items, vp));
-    lines.push({str:'',x:0,pageW:vp.width}); // page break
+    lines.push({str:'',x:0,pageW:vp.width});
   }
   return lines;
 }
@@ -367,6 +370,7 @@ function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
 
   let curY=mY+fontSize;
   function newPage(){doc.addPage();curY=mY+fontSize;}
+  
   function putText(text,style) {
     const indent=cW*style.indentFrac, usableW=cW-indent;
     doc.setFontSize(style.size);
@@ -381,24 +385,57 @@ function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
   }
 
   let lastType=null;
-  for(const line of lines) {
-    const raw=(line.str||'').trim();
-    const xNorm=line.pageW>0?line.x/line.pageW:0;
-    const type=smartFormat?classify(raw,xNorm):(raw?'action':'blank');
+  let currentType=null;
+  let currentText='';
 
-    if(!raw||type==='blank') {
-      if(lastType&&lastType!=='blank') curY+=fontSize*0.5;
-      lastType='blank'; continue;
+  function flush() {
+    if(currentText) {
+      putText(currentText, styles[currentType]);
+      currentText = '';
+    }
+  }
+
+  for(const line of lines) {
+    let raw=(line.str||'').trim();
+    // Remove PDF artifacts like bookmarks/comments
+    raw = raw.replace(/\[\[.*?\]\]/g, '').trim();
+    
+    if(!raw) {
+      flush();
+      if(lastType && lastType !== 'blank') curY += fontSize * 0.5;
+      lastType = 'blank';
+      currentType = null;
+      continue;
     }
 
-    // Spacing between blocks
-    if(type==='scene'&&lastType&&lastType!=='blank')       curY+=fontSize*1.2;
-    else if(type==='character'&&lastType==='action')       curY+=fontSize*0.8;
-    else if(lastType==='dialogue'&&type==='action')        curY+=fontSize*0.6;
+    // Skip standalone page numbers
+    if(/^\d+\.?$/.test(raw)) continue;
 
-    putText(raw,styles[type]);
-    lastType=type;
+    const xNorm=line.pageW>0?line.x/line.pageW:0;
+    const type=smartFormat?classify(raw,xNorm):'action';
+
+    // Scene headings often have stray page numbers at the start in bad PDFs, strip them
+    if(type==='scene') {
+      raw = raw.replace(/^\d+\s*/, '');
+    }
+
+    if(type === currentType) {
+      // Group consecutive lines of the same type into a paragraph
+      currentText += ' ' + raw;
+    } else {
+      flush();
+      // Vertical spacing between different block types
+      if(type==='scene' && lastType && lastType !== 'blank') curY += fontSize * 1.2;
+      else if(type==='character' && lastType==='action') curY += fontSize * 0.8;
+      else if(lastType==='dialogue' && type==='action') curY += fontSize * 0.6;
+      else if(lastType && lastType !== 'blank') curY += fontSize * 0.4;
+
+      currentType = type;
+      currentText = raw;
+      lastType = type;
+    }
   }
+  flush();
   return doc;
 }
 
@@ -422,7 +459,6 @@ async function go() {
     const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
     const n=pdf.numPages;
     
-    // Pre-flight check: detect scanned content early
     const firstPage = await pdf.getPage(1);
     const firstPageText = (await firstPage.getTextContent()).items.map(i => i.str).join('').trim();
     if (firstPageText.length < 50 && !useOCR) {
