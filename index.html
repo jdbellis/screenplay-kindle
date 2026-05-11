@@ -4,806 +4,449 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Screenplay → Kindle</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f7f5f0; --bg2: #ffffff; --bg3: #f0ece3;
+  --border: #d8d2c4; --border2: #c4bca8;
+  --text: #1a1814; --muted: #7a7060;
+  --accent: #8b4513; --accent2: #a0522d;
+  --danger: #c0392b; --success: #27ae60;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+}
+body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:15px; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:40px 20px 80px; }
+.wrap { width:100%; max-width:620px; }
+h1 { font-family:var(--mono); font-size:20px; font-weight:400; letter-spacing:-0.02em; margin-bottom:4px; }
+h1 span { color:var(--accent); }
+.subtitle { font-size:12px; color:var(--muted); font-family:var(--mono); margin-bottom:36px; }
 
-  :root {
-    --bg: #0f0e0c;
-    --bg2: #1a1814;
-    --bg3: #222018;
-    --border: #2e2b22;
-    --border2: #3d3928;
-    --text: #e8e4d8;
-    --muted: #7a7568;
-    --accent: #c8a84b;
-    --accent2: #8b6f2a;
-    --danger: #c0392b;
-    --success: #2ecc71;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'DM Mono', monospace;
-  }
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:6px; margin-bottom:16px; overflow:hidden; }
+.card-head { padding:10px 16px; border-bottom:1px solid var(--border); font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; display:flex; align-items:center; gap:8px; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--border2); flex-shrink:0; }
+.dot.ok { background:var(--success); } .dot.err { background:var(--danger); }
+.card-body { padding:14px 16px; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 15px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 48px 20px 80px;
-  }
+.row { display:flex; gap:8px; margin-bottom:8px; }
+.row:last-child { margin-bottom:0; }
+input[type=text], input[type=password] { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:12px; padding:7px 10px; outline:none; }
+input[type=text]:focus, input[type=password]:focus { border-color:var(--accent2); }
+input::placeholder { color:var(--border2); }
+.note { font-size:11px; color:var(--muted); line-height:1.6; margin-top:8px; }
 
-  .grain {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-size: 128px;
-  }
+.btn { background:var(--accent); color:#fff; border:none; border-radius:4px; padding:7px 14px; font-family:var(--mono); font-size:12px; font-weight:500; cursor:pointer; white-space:nowrap; transition:opacity .15s; }
+.btn:hover { opacity:.85; }
+.btn.outline { background:transparent; color:var(--accent); border:1px solid var(--accent2); }
+.btn.outline:hover { background:rgba(139,69,19,.06); }
+.btn.big { width:100%; padding:12px; font-size:13px; margin-bottom:10px; display:none; }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
 
-  .wrap { width: 100%; max-width: 640px; position: relative; z-index: 1; }
+.drop { border:1.5px dashed var(--border2); border-radius:6px; padding:36px 24px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s; margin-bottom:16px; }
+.drop:hover, .drop.over { border-color:var(--accent2); background:rgba(139,69,19,.03); }
+.drop input { display:none; }
+.drop-icon { font-size:32px; margin-bottom:10px; opacity:.4; }
+.drop-title { font-family:var(--mono); font-size:13px; margin-bottom:3px; }
+.drop-sub { font-size:12px; color:var(--muted); }
+.chip { display:inline-flex; align-items:center; gap:6px; background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:3px 10px; margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--accent); }
 
-  header { margin-bottom: 48px; }
-  .logo-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
-  h1 {
-    font-family: var(--font-mono);
-    font-size: 22px;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-  h1 span { color: var(--accent); }
-  .subtitle { font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
+.opt { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; }
+.opt + .opt { border-top:1px solid var(--border); }
+.opt-lbl { font-size:13px; color:var(--muted); }
+.opt-lbl small { display:block; font-size:11px; color:var(--border2); margin-top:1px; }
+select { background:var(--bg3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:12px; padding:5px 8px; outline:none; cursor:pointer; }
 
-  /* LM Studio section */
-  .api-section {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-  }
-  .api-label {
-    font-size: 11px;
-    font-family: var(--font-mono);
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .api-label .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--danger);
-    display: inline-block;
-  }
-  .api-label .dot.ok { background: var(--success); }
-  .api-row { display: flex; gap: 8px; margin-bottom: 8px; }
-  .api-row input {
-    flex: 1;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: 3px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 13px;
-    padding: 8px 12px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .api-row input:focus { border-color: var(--accent2); }
-  .api-row input::placeholder { color: var(--muted); }
-  .btn-save {
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    border-radius: 3px;
-    padding: 8px 16px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: opacity 0.15s;
-  }
-  .btn-save:hover { opacity: 0.85; }
-  .btn-test {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent2);
-    border-radius: 3px;
-    padding: 8px 14px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s;
-  }
-  .btn-test:hover { background: rgba(200,168,75,0.07); }
-  .api-note { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
-  .api-note a { color: var(--accent2); text-decoration: none; }
-  .api-note a:hover { text-decoration: underline; }
-  .model-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-  .model-row label { font-size: 11px; color: var(--muted); font-family: var(--font-mono); white-space: nowrap; }
+.sw { display:flex; align-items:center; gap:10px; }
+input[type=range] { -webkit-appearance:none; width:80px; height:2px; background:var(--border); border-radius:2px; outline:none; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--accent); cursor:pointer; }
+.sv { font-family:var(--mono); font-size:12px; color:var(--accent); min-width:28px; }
 
-  /* Drop zone */
-  .drop-zone {
-    border: 1px dashed var(--border2);
-    border-radius: 4px;
-    padding: 40px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    margin-bottom: 24px;
-    position: relative;
-  }
-  .drop-zone:hover, .drop-zone.drag-over {
-    border-color: var(--accent2);
-    background: rgba(200, 168, 75, 0.03);
-  }
-  .drop-zone input[type=file] { display: none; }
-  .drop-icon {
-    font-size: 36px;
-    margin-bottom: 12px;
-    opacity: 0.5;
-  }
-  .drop-title { font-family: var(--font-mono); font-size: 14px; color: var(--text); margin-bottom: 4px; }
-  .drop-sub { font-size: 12px; color: var(--muted); }
-  .file-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--bg3); border: 1px solid var(--border2);
-    border-radius: 3px; padding: 4px 10px;
-    font-family: var(--font-mono); font-size: 12px; color: var(--accent);
-    margin-top: 10px;
-  }
+.tog { position:relative; width:34px; height:20px; cursor:pointer; flex-shrink:0; }
+.tog input { display:none; }
+.tog-t { position:absolute; inset:0; background:var(--border); border-radius:10px; transition:background .2s; }
+.tog input:checked + .tog-t { background:var(--accent); }
+.tog-k { position:absolute; top:3px; left:3px; width:14px; height:14px; background:#fff; border-radius:50%; transition:left .2s; }
+.tog input:checked ~ .tog-k { left:17px; }
 
-  /* Options panel */
-  .panel {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0;
-    margin-bottom: 24px;
-    overflow: hidden;
-  }
-  .panel-header {
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .opt-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 13px 20px;
-    border-bottom: 1px solid var(--border));
-    font-size: 13px;
-  }
-  .opt-row:last-child { border-bottom: none; }
-  .opt-row + .opt-row { border-top: 1px solid var(--border); }
-  .opt-label { color: var(--muted); font-size: 13px; }
-  .opt-label small { display: block; font-size: 11px; color: #4a4840; margin-top: 2px; }
+.log { background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:12px 16px; margin-bottom:14px; display:none; min-height:48px; }
+.ll { font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9; }
+.ll.hi { color:var(--text); } .ll.ok { color:var(--success); } .ll.er { color:var(--danger); }
 
-  select {
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: 3px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    padding: 5px 8px;
-    outline: none;
-    cursor: pointer;
-  }
-  select:focus { border-color: var(--accent2); }
+.prog { height:3px; background:var(--border); border-radius:2px; margin-bottom:14px; display:none; overflow:hidden; }
+.prog-fill { height:100%; background:var(--accent); border-radius:2px; width:0%; transition:width .3s; }
 
-  .range-wrap { display: flex; align-items: center; gap: 10px; }
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 90px; height: 2px;
-    background: var(--border2);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-  }
-  .range-val { font-family: var(--font-mono); font-size: 12px; color: var(--accent); min-width: 28px; }
-
-  .toggle-wrap { display: flex; align-items: center; gap: 10px; }
-  .toggle {
-    position: relative; width: 32px; height: 18px;
-    cursor: pointer;
-  }
-  .toggle input { display: none; }
-  .toggle-track {
-    position: absolute; inset: 0;
-    background: var(--border2);
-    border-radius: 9px;
-    transition: background 0.2s;
-  }
-  .toggle input:checked + .toggle-track { background: var(--accent2); }
-  .toggle-thumb {
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 12px; height: 12px;
-    background: var(--muted);
-    border-radius: 50%;
-    transition: left 0.2s, background 0.2s;
-  }
-  .toggle input:checked ~ .toggle-thumb { left: 17px; background: var(--accent); }
-
-  /* Log / status */
-  .log-area {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    min-height: 52px;
-    display: none;
-  }
-  .log-line {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.8;
-  }
-  .log-line.active { color: var(--text); }
-  .log-line.ok { color: var(--success); }
-  .log-line.err { color: var(--danger); }
-
-  .progress-track {
-    height: 2px; background: var(--border2);
-    border-radius: 2px; margin-bottom: 20px;
-    overflow: hidden; display: none;
-  }
-  .progress-fill {
-    height: 100%; background: var(--accent);
-    border-radius: 2px; width: 0%;
-    transition: width 0.3s ease;
-  }
-
-  /* Buttons */
-  .btn-primary {
-    width: 100%;
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    border-radius: 3px;
-    padding: 13px 24px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    display: none;
-  }
-  .btn-primary:hover { opacity: 0.88; }
-  .btn-primary:active { transform: scale(0.99); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-dl {
-    width: 100%;
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent2);
-    border-radius: 3px;
-    padding: 13px 24px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    transition: background 0.15s;
-    display: none;
-    margin-top: 10px;
-  }
-  .btn-dl:hover { background: rgba(200,168,75,0.07); }
-
-  .hint {
-    font-size: 12px; color: var(--muted);
-    text-align: center; margin-top: 20px;
-    line-height: 1.6;
-    font-family: var(--font-mono);
-  }
+.hint { font-size:12px; color:var(--muted); text-align:center; margin-top:16px; line-height:1.7; font-family:var(--mono); }
 </style>
 </head>
 <body>
-<div class="grain"></div>
 <div class="wrap">
 
-  <header>
-    <div class="logo-row">
-      <h1>screenplay<span>→</span>kindle</h1>
-    </div>
-    <div class="subtitle">// pdf reformatter · text &amp; scanned</div>
-  </header>
+<h1>screenplay<span> → </span>kindle</h1>
+<div class="subtitle">// pdf reformatter · text &amp; scanned</div>
 
-  <!-- LM Studio config -->
-  <div class="api-section">
-    <div class="api-label">
-      <span class="dot" id="key-dot"></span>
-      <span id="key-label">LM Studio — local server config (for scanned PDFs)</span>
+<div class="card">
+  <div class="card-head"><span class="dot" id="dot"></span><span id="dot-lbl">LM Studio — for scanned PDFs only</span></div>
+  <div class="card-body">
+    <div class="row">
+      <input type="text" id="lms-url" value="http://localhost:1234" placeholder="http://localhost:1234">
+      <button class="btn" onclick="saveConfig()">Save</button>
+      <button class="btn outline" onclick="testConn()">Test</button>
     </div>
-    <div class="api-row">
-      <input type="text" id="lms-url" placeholder="http://localhost:1234" autocomplete="off" value="http://localhost:1234">
-      <button class="btn-save" onclick="saveConfig()">Save</button>
-      <button class="btn-test" onclick="testConnection()">Test</button>
+    <div class="row">
+      <input type="text" id="lms-model" placeholder="vision model name, e.g. qwen2-vl-7b-instruct">
+      <button class="btn outline" onclick="listModels()" style="font-size:11px">List</button>
     </div>
-    <div class="model-row">
-      <label>Vision model:</label>
-      <input type="text" id="lms-model" placeholder="e.g. qwen2-vl-7b-instruct" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--font-mono);font-size:12px;padding:6px 10px;outline:none;">
-      <button class="btn-test" onclick="fetchModels()" style="font-size:11px;padding:6px 10px;">List models</button>
-    </div>
-    <div class="api-note">
-      Start LM Studio → Local Server tab → load a <strong style="color:var(--text)">vision-capable model</strong> (Qwen2-VL, LLaVA, MiniCPM-V, etc.) → Start Server.<br>
-      Only needed for scanned/image PDFs. Text PDFs work with no server at all.
-    </div>
+    <div class="note">LM Studio → Local Server → load a <strong>vision model</strong> (Qwen2-VL recommended) → Start Server.<br>Text PDFs convert with no server needed.</div>
   </div>
+</div>
 
-  <!-- Drop zone -->
-  <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-    <input type="file" id="file-input" accept=".pdf">
-    <div class="drop-icon">⬡</div>
-    <div class="drop-title">Drop screenplay PDF here</div>
-    <div class="drop-sub">or click to browse</div>
-    <div id="file-badge" style="display:none;" class="file-badge">
-      <span>📄</span><span id="file-name-display"></span>
-    </div>
+<div class="drop" id="drop" onclick="document.getElementById('fi').click()">
+  <input type="file" id="fi" accept=".pdf">
+  <div class="drop-icon">📄</div>
+  <div class="drop-title">Drop screenplay PDF here</div>
+  <div class="drop-sub">or click to browse</div>
+  <div class="chip" id="chip" style="display:none">📄 <span id="chip-name"></span></div>
+</div>
+
+<div class="card">
+  <div class="card-head">Output settings</div>
+  <div class="opt">
+    <div class="opt-lbl">Font size</div>
+    <div class="sw"><input type="range" id="s-size" min="11" max="18" value="14" step="1"><span class="sv" id="s-size-v">14pt</span></div>
   </div>
-
-  <!-- Options -->
-  <div class="panel">
-    <div class="panel-header">Output settings</div>
-    <div class="opt-row">
-      <div class="opt-label">Font size</div>
-      <div class="range-wrap">
-        <input type="range" id="opt-fontsize" min="11" max="18" value="14" step="1">
-        <span class="range-val" id="opt-fontsize-out">14pt</span>
-      </div>
-    </div>
-    <div class="opt-row">
-      <div class="opt-label">Page size</div>
-      <select id="opt-pagesize">
-        <option value="kindle">Kindle (4.7" × 6.5")</option>
-        <option value="a5">A5 (slightly larger)</option>
-        <option value="a4">A4 (original size)</option>
-      </select>
-    </div>
-    <div class="opt-row">
-      <div class="opt-label">Line spacing</div>
-      <select id="opt-spacing">
-        <option value="1.15">Compact 1.15×</option>
-        <option value="1.4" selected>Normal 1.4×</option>
-        <option value="1.6">Relaxed 1.6×</option>
-      </select>
-    </div>
-    <div class="opt-row">
-      <div class="opt-label">
-        Smart formatting
-        <small>Detect scene headings, dialogue, etc.</small>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="opt-smart" checked>
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
-      </label>
-    </div>
-    <div class="opt-row">
-      <div class="opt-label">
-        OCR mode (scanned PDFs)
-        <small>Uses Anthropic API vision to read image pages</small>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="opt-ocr">
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
-      </label>
-    </div>
+  <div class="opt">
+    <div class="opt-lbl">Page size</div>
+    <select id="s-page">
+      <option value="kindle">Kindle (4.7" × 6.5")</option>
+      <option value="a5">A5 — slightly larger</option>
+      <option value="a4">A4 — original size</option>
+    </select>
   </div>
-
-  <!-- Log -->
-  <div class="log-area" id="log-area">
-    <div class="log-line" id="log-1"></div>
-    <div class="log-line" id="log-2"></div>
-    <div class="log-line" id="log-3"></div>
+  <div class="opt">
+    <div class="opt-lbl">Line spacing</div>
+    <select id="s-space">
+      <option value="1.1">Compact 1.1×</option>
+      <option value="1.35" selected>Normal 1.35×</option>
+      <option value="1.6">Relaxed 1.6×</option>
+    </select>
   </div>
-
-  <div class="progress-track" id="progress-track">
-    <div class="progress-fill" id="progress-fill"></div>
+  <div class="opt">
+    <div class="opt-lbl">Smart formatting<small>Detect scene headings, dialogue, etc.</small></div>
+    <label class="tog"><input type="checkbox" id="s-smart" checked><div class="tog-t"></div><div class="tog-k"></div></label>
   </div>
-
-  <button class="btn-primary" id="convert-btn" onclick="startConvert()">Convert for Kindle</button>
-  <button class="btn-dl" id="dl-btn">⬇ Download Kindle PDF</button>
-
-  <div class="hint">
-    Send the output to your Kindle via email (yourname@kindle.com)<br>or drag into the Kindle app / Calibre.
+  <div class="opt">
+    <div class="opt-lbl">OCR mode<small>For scanned / image-based PDFs</small></div>
+    <label class="tog"><input type="checkbox" id="s-ocr"><div class="tog-t"></div><div class="tog-k"></div></label>
   </div>
+</div>
 
+<div class="log" id="log">
+  <div class="ll" id="l1"></div>
+  <div class="ll" id="l2"></div>
+  <div class="ll" id="l3"></div>
+</div>
+<div class="prog" id="prog"><div class="prog-fill" id="prog-fill"></div></div>
+
+<button class="btn big" id="go-btn" onclick="go()">Convert for Kindle</button>
+<button class="btn big outline" id="dl-btn" style="display:none">⬇ Download PDF</button>
+
+<div class="hint">Send to Kindle via email (yourname@kindle.com) or drag into the Kindle app.</div>
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-let pdfFile = null;
-let outputBlob = null;
-let logLines = ['','',''];
+let pdfFile = null, outBlob = null;
 
-// ── LM Studio config ─────────────────────────────────────
+// ── Config ───────────────────────────────────────────────
 function loadConfig() {
-  const url = localStorage.getItem('lms_url') || 'http://localhost:1234';
-  const model = localStorage.getItem('lms_model') || '';
-  document.getElementById('lms-url').value = url;
-  document.getElementById('lms-model').value = model;
-  setKeyIndicator(false);
+  document.getElementById('lms-url').value   = localStorage.getItem('lms_url')   || 'http://localhost:1234';
+  document.getElementById('lms-model').value = localStorage.getItem('lms_model') || '';
 }
 function saveConfig() {
-  const url = document.getElementById('lms-url').value.trim().replace(/\/$/, '');
-  const model = document.getElementById('lms-model').value.trim();
-  localStorage.setItem('lms_url', url);
-  localStorage.setItem('lms_model', model);
-  setKeyIndicator(true, 'Config saved');
+  localStorage.setItem('lms_url',   document.getElementById('lms-url').value.trim().replace(/\/$/,''));
+  localStorage.setItem('lms_model', document.getElementById('lms-model').value.trim());
+  setDot('ok','Saved ✓');
+  setTimeout(()=>setDot(null,'LM Studio — for scanned PDFs only'),2000);
 }
-function getLMSUrl() { return (document.getElementById('lms-url').value.trim() || localStorage.getItem('lms_url') || 'http://localhost:1234').replace(/\/$/, ''); }
-function getLMSModel() { return document.getElementById('lms-model').value.trim() || localStorage.getItem('lms_model') || ''; }
-
-async function testConnection() {
-  setKeyIndicator(false, 'Testing...');
+function lmsUrl()   { return (document.getElementById('lms-url').value.trim()||'http://localhost:1234').replace(/\/$/,''); }
+function lmsModel() { return document.getElementById('lms-model').value.trim()||localStorage.getItem('lms_model')||''; }
+function setDot(cls,msg) {
+  document.getElementById('dot').className = 'dot'+(cls?' '+cls:'');
+  document.getElementById('dot-lbl').textContent = msg;
+}
+async function testConn() {
+  setDot(null,'Testing…');
   try {
-    const res = await fetch(getLMSUrl() + '/v1/models', { signal: AbortSignal.timeout(4000) });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const models = (data.data || []).map(m => m.id).join(', ') || '(none loaded)';
-    setKeyIndicator(true, 'Connected ✓ — ' + models.substring(0, 60));
-  } catch(e) {
-    setKeyIndicator(false, 'Cannot reach LM Studio: ' + e.message);
-  }
+    const r = await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    const names = (d.data||[]).map(m=>m.id).join(', ')||'(no models loaded)';
+    setDot('ok','Connected ✓  '+names.slice(0,55));
+  } catch(e) { setDot('err','Cannot reach LM Studio: '+e.message); }
 }
-async function fetchModels() {
+async function listModels() {
   try {
-    const res = await fetch(getLMSUrl() + '/v1/models', { signal: AbortSignal.timeout(4000) });
-    const data = await res.json();
-    const ids = (data.data || []).map(m => m.id);
-    if (ids.length === 0) { alert('No models loaded in LM Studio.'); return; }
-    const pick = ids.length === 1 ? ids[0] : prompt('Models available:\n' + ids.join('\n') + '\n\nEnter the vision model name:', ids[0]);
-    if (pick) { document.getElementById('lms-model').value = pick; saveConfig(); }
-  } catch(e) { alert('Could not reach LM Studio at ' + getLMSUrl()); }
-}
-
-function setKeyIndicator(ok, msg) {
-  document.getElementById('key-dot').className = 'dot' + (ok ? ' ok' : '');
-  document.getElementById('key-label').textContent = msg || (ok ? 'LM Studio — connected' : 'LM Studio — local server config (for scanned PDFs)');
+    const r = await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
+    const d = await r.json();
+    const ids = (d.data||[]).map(m=>m.id);
+    if (!ids.length){alert('No models loaded in LM Studio.');return;}
+    const pick = ids.length===1?ids[0]:prompt('Pick a vision model:\n\n'+ids.join('\n'),ids[0]);
+    if (pick){document.getElementById('lms-model').value=pick;saveConfig();}
+  } catch(e){alert('Could not reach LM Studio at '+lmsUrl());}
 }
 loadConfig();
 
-// ── File handling ────────────────────────────────────────
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type === 'application/pdf') setFile(f);
-  else log('Please drop a PDF file.', 'err');
+// ── File drop ────────────────────────────────────────────
+const drop=document.getElementById('drop'), fi=document.getElementById('fi');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',e=>{
+  e.preventDefault();drop.classList.remove('over');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type==='application/pdf') setFile(f); else logMsg('Please drop a PDF.','er');
 });
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
-document.getElementById('opt-fontsize').addEventListener('input', function() {
-  document.getElementById('opt-fontsize-out').textContent = this.value + 'pt';
+fi.addEventListener('change',()=>{if(fi.files[0])setFile(fi.files[0]);});
+document.getElementById('s-size').addEventListener('input',function(){
+  document.getElementById('s-size-v').textContent=this.value+'pt';
 });
-
 function setFile(f) {
-  pdfFile = f;
-  outputBlob = null;
-  document.getElementById('file-badge').style.display = 'inline-flex';
-  document.getElementById('file-name-display').textContent = f.name + ' (' + Math.round(f.size/1024) + ' KB)';
-  document.getElementById('convert-btn').style.display = 'block';
-  document.getElementById('dl-btn').style.display = 'none';
+  pdfFile=f; outBlob=null;
+  document.getElementById('chip').style.display='inline-flex';
+  document.getElementById('chip-name').textContent=f.name+' ('+Math.round(f.size/1024)+' KB)';
+  document.getElementById('go-btn').style.display='block';
+  document.getElementById('dl-btn').style.display='none';
   clearLog();
 }
 
-// ── Logging ──────────────────────────────────────────────
+// ── Log ──────────────────────────────────────────────────
+let buf=['','',''];
 function clearLog() {
-  logLines = ['','',''];
-  ['log-1','log-2','log-3'].forEach((id,i) => { document.getElementById(id).textContent=''; document.getElementById(id).className='log-line'; });
-  document.getElementById('log-area').style.display = 'none';
-  document.getElementById('progress-track').style.display = 'none';
+  buf=['','',''];
+  ['l1','l2','l3'].forEach(id=>{document.getElementById(id).textContent='';document.getElementById(id).className='ll';});
+  document.getElementById('log').style.display='none';
+  document.getElementById('prog').style.display='none';
 }
-function log(msg, cls) {
-  logLines = [...logLines.slice(1), msg];
-  const area = document.getElementById('log-area');
-  area.style.display = 'block';
-  ['log-1','log-2','log-3'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    el.textContent = logLines[i] ? '> ' + logLines[i] : '';
-    el.className = 'log-line' + (i===2 && cls ? ' '+cls : i===2 ? ' active' : '');
+function logMsg(msg,cls) {
+  buf=[...buf.slice(1),msg];
+  document.getElementById('log').style.display='block';
+  ['l1','l2','l3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.textContent=buf[i]?'> '+buf[i]:'';
+    el.className='ll'+(i===2&&cls?' '+cls:i===2?' hi':'');
   });
 }
-function setProgress(pct) {
-  document.getElementById('progress-track').style.display = 'block';
-  document.getElementById('progress-fill').style.width = pct + '%';
-}
+function setProg(pct){document.getElementById('prog').style.display='block';document.getElementById('prog-fill').style.width=pct+'%';}
 
-// ── Page size map ────────────────────────────────────────
-const PAGE_SIZES = { kindle:[338,468], a5:[420,595], a4:[595,842] };
+// ── Page sizes ───────────────────────────────────────────
+const PAGE_SIZES={kindle:[338,468],a5:[420,595],a4:[595,842]};
 
-// ── Classify line ────────────────────────────────────────
-function classifyLine(text, x) {
-  const t = text.trim();
-  if (!t) return 'blank';
-  const caps = t === t.toUpperCase() && /[A-Z]/.test(t);
-  if (/^(INT|EXT|INT\/EXT|EXT\/INT)[\.\s]/.test(t) && caps) return 'scene';
-  if (x > 180 && x < 310 && caps && t.length < 45 && !/^(FADE|CUT|DISSOLVE|SMASH|MATCH)/.test(t)) return 'character';
-  if (t.startsWith('(') && t.endsWith(')') && x > 120) return 'parenthetical';
-  if (x > 120 && x < 340 && !caps) return 'dialogue';
-  if (caps && /^(FADE|CUT|DISSOLVE|SMASH|MATCH|TITLE|OVER BLACK)/.test(t)) return 'transition';
+// ── Classifier — uses normalised x (0–1) ─────────────────
+function classify(text, xNorm) {
+  const t=text.trim();
+  if(!t) return 'blank';
+  const allCaps=t===t.toUpperCase()&&/[A-Z]/.test(t);
+  if(allCaps&&/^(INT|EXT|INT\.\/EXT|EXT\.\/INT|I\/E)[\.\s\-]/.test(t)) return 'scene';
+  if(allCaps&&/^(FADE (IN|OUT)|CUT TO|DISSOLVE TO|SMASH CUT|MATCH CUT|INTERCUT|TITLE CARD|THE END|OVER BLACK)/.test(t)) return 'transition';
+  if(allCaps&&t.length<50&&!t.includes('.')&&xNorm>0.25&&xNorm<0.75) return 'character';
+  if(t.startsWith('(')&&t.endsWith(')')&&xNorm>0.15) return 'parenthetical';
+  if(xNorm>0.12&&xNorm<0.75&&!allCaps) return 'dialogue';
   return 'action';
 }
 
-// ── Extract text from regular PDF ───────────────────────
-async function extractTextPDF(pdf) {
-  const lines = [];
-  const n = pdf.numPages;
-  for (let p = 1; p <= n; p++) {
-    log('Extracting page ' + p + ' / ' + n + '...');
-    setProgress(5 + (p/n)*40);
-    const page = await pdf.getPage(p);
-    const content = await page.getTextContent();
-    const vp = page.getViewport({ scale: 1 });
-    const h = vp.height;
-    const items = content.items
-      .filter(i => i.str.trim())
-      .map(i => ({ text: i.str, x: i.transform[4], y: h - i.transform[5] }))
-      .sort((a,b) => a.y - b.y || a.x - b.x);
-    const grouped = [];
-    for (const item of items) {
-      const last = grouped[grouped.length-1];
-      if (last && Math.abs(last.y - item.y) < 3) { last.text += item.text; }
-      else grouped.push({ ...item });
+// ── Extract text PDF ─────────────────────────────────────
+async function extractText(pdf) {
+  const lines=[];
+  const n=pdf.numPages;
+  for(let p=1;p<=n;p++) {
+    logMsg('Reading page '+p+' / '+n);
+    setProg(5+(p/n)*40);
+    const page=await pdf.getPage(p);
+    const vp=page.getViewport({scale:1});
+    const tc=await page.getTextContent();
+    const items=tc.items
+      .filter(i=>i.str&&i.str.trim())
+      .map(i=>({str:i.str,x:i.transform[4],y:vp.height-i.transform[5],pageW:vp.width}))
+      .sort((a,b)=>a.y-b.y||a.x-b.x);
+    const rows=[];
+    for(const item of items) {
+      const last=rows[rows.length-1];
+      if(last&&Math.abs(last.y-item.y)<6){last.str+=item.str;}
+      else rows.push({...item});
     }
-    for (const ln of grouped) lines.push({ ...ln, page: p });
+    lines.push(...rows);
+    lines.push({str:'',x:0,pageW:612});
   }
   return lines;
 }
 
-// ── OCR a single page via LM Studio vision ───────────────
-async function ocrPage(imageDataUrl, pageNum, total) {
-  log('OCR page ' + pageNum + ' / ' + total + ' via LM Studio...');
-  const base64 = imageDataUrl.split(',')[1];
-  const url = getLMSUrl() + '/v1/chat/completions';
-  const model = getLMSModel();
-  if (!model) throw new Error('No vision model set. Enter a model name in the LM Studio config above.');
+// ── Scanned page detection ───────────────────────────────
+async function isScanned(page) {
+  const tc=await page.getTextContent();
+  return tc.items.map(i=>i.str).join('').trim().length<30;
+}
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: model,
-      max_tokens: 2000,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'image_url',
-            image_url: { url: 'data:image/jpeg;base64,' + base64 }
-          },
-          {
-            type: 'text',
-            text: `This is a page from a screenplay. Extract ALL the text exactly as it appears, preserving:
-- Scene headings (INT./EXT. lines)
-- Action/description paragraphs  
-- Character names (centered, ALL CAPS)
-- Parentheticals in (parentheses)
-- Dialogue
-- Transitions (FADE IN:, CUT TO:, etc.)
+// ── Page → image ─────────────────────────────────────────
+async function pageToImg(page) {
+  const vp=page.getViewport({scale:2});
+  const c=document.createElement('canvas');
+  c.width=vp.width; c.height=vp.height;
+  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+  return c.toDataURL('image/jpeg',0.92);
+}
 
-Output ONLY the raw text, line by line, with NO commentary, NO markdown formatting, NO backticks. Preserve the original line breaks and approximate indentation using spaces. Each line on its own line.`
-          }
-        ]
-      }]
+// ── OCR via LM Studio ────────────────────────────────────
+async function ocrPage(imgUrl,p,n) {
+  logMsg('OCR page '+p+' / '+n+'…');
+  const model=lmsModel();
+  if(!model) throw new Error('No vision model set — enter one in the LM Studio section above.');
+  const res=await fetch(lmsUrl()+'/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model,max_tokens:2048,temperature:0,
+      messages:[{role:'user',content:[
+        {type:'image_url',image_url:{url:imgUrl}},
+        {type:'text',text:'You are a screenplay OCR engine. Transcribe this screenplay page exactly.\nRules:\n- Output ONLY the text. No commentary, no markdown, no code fences.\n- Preserve ALL line breaks exactly as they appear.\n- Preserve indentation using spaces (scene headings flush left, character names centred, dialogue indented).\n- Do not merge or split lines.\n- Do not add or remove any words.'}
+      ]}]
     })
   });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error('LM Studio error ' + res.status + ': ' + err.substring(0, 200));
-  }
-  const data = await res.json();
+  if(!res.ok){const e=await res.text();throw new Error('LM Studio '+res.status+': '+e.slice(0,150));}
+  const data=await res.json();
   return data.choices[0].message.content;
 }
 
-// ── Render PDF page to image for OCR ────────────────────
-async function renderPageToImage(page) {
-  const scale = 1.5;
-  const vp = page.getViewport({ scale });
-  const canvas = document.createElement('canvas');
-  canvas.width = vp.width; canvas.height = vp.height;
-  const ctx = canvas.getContext('2d');
-  await page.render({ canvasContext: ctx, viewport: vp }).promise;
-  return canvas.toDataURL('image/jpeg', 0.9);
+// ── Parse OCR text → lines ───────────────────────────────
+function parseOcr(text) {
+  return text.split('\n').map(raw=>{
+    const t=raw.trimEnd();
+    if(!t.trim()) return {str:'',x:0,pageW:612};
+    const spaces=t.length-t.trimStart().length;
+    return {str:t.trimStart(),x:spaces*7.2,pageW:612};
+  });
 }
 
-// ── Parse OCR text into line objects ─────────────────────
-function parseOcrText(ocrText) {
-  const lines = [];
-  for (const raw of ocrText.split('\n')) {
-    const t = raw.trimEnd();
-    if (!t.trim()) { lines.push({ text: '', x: 0 }); continue; }
-    const spaces = t.length - t.trimStart().length;
-    const x = spaces * 5;
-    lines.push({ text: t.trim(), x });
-  }
-  return lines;
-}
+// ── Build PDF ────────────────────────────────────────────
+function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
+  const [pageW,pageH]=PAGE_SIZES[pageSizeKey];
+  const mX=pageSizeKey==='kindle'?24:42, mY=pageSizeKey==='kindle'?28:48;
+  const cW=pageW-mX*2;
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'pt',format:[pageW,pageH]});
 
-// ── Detect if PDF is scanned (image-only) ────────────────
-async function isScannedPage(page) {
-  const content = await page.getTextContent();
-  const txt = content.items.map(i=>i.str).join('').trim();
-  return txt.length < 50;
-}
-
-// ── Build output PDF ─────────────────────────────────────
-function buildPDF(lines, fontSize, pageSizeKey, lineSpacing, smartFormat) {
-  const [pageW, pageH] = PAGE_SIZES[pageSizeKey];
-  const margin = pageSizeKey === 'kindle' ? 22 : 40;
-  const contentW = pageW - margin * 2;
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'pt', format: [pageW, pageH] });
-
-  const styleMap = {
-    scene:         { size: fontSize,     bold: true,  indent: 0,                color: [232,228,216] },
-    character:     { size: fontSize,     bold: true,  indent: contentW * 0.28,  color: [232,228,216] },
-    parenthetical: { size: fontSize-1,  bold: false, indent: contentW * 0.18,  color: [140,134,120] },
-    dialogue:      { size: fontSize,     bold: false, indent: contentW * 0.12,  color: [232,228,216] },
-    transition:    { size: fontSize-1,  bold: false, indent: contentW * 0.55,  color: [140,134,120] },
-    action:        { size: fontSize,     bold: false, indent: 0,                color: [232,228,216] },
-    blank:         { size: fontSize,     bold: false, indent: 0,                color: [232,228,216] },
+  const styles={
+    scene:        {size:fontSize,   bold:true, indentFrac:0,    r:0,  g:0,  b:0  },
+    character:    {size:fontSize,   bold:true, indentFrac:0.30, r:0,  g:0,  b:0  },
+    parenthetical:{size:fontSize-1,bold:false,indentFrac:0.20, r:70, g:70, b:70 },
+    dialogue:     {size:fontSize,   bold:false,indentFrac:0.13, r:0,  g:0,  b:0  },
+    transition:   {size:fontSize-1,bold:false,indentFrac:0.55, r:70, g:70, b:70 },
+    action:       {size:fontSize,   bold:false,indentFrac:0,    r:0,  g:0,  b:0  },
   };
 
-  // Dark background
-  function newPage() {
-    doc.setFillColor(15, 14, 12);
-    doc.rect(0, 0, pageW, pageH, 'F');
-  }
-  newPage();
-
-  let curY = margin + fontSize;
-
-  function addText(text, style) {
-    const usableW = contentW - style.indent;
+  let curY=mY+fontSize;
+  function newPage(){doc.addPage();curY=mY+fontSize;}
+  function putText(text,style) {
+    const indent=cW*style.indentFrac, usableW=cW-indent;
     doc.setFontSize(style.size);
-    doc.setFont('Courier', style.bold ? 'bold' : 'normal');
-    const wrapped = doc.splitTextToSize(text, usableW);
-    doc.setTextColor(...style.color);
-    const lineH = style.size * lineSpacing;
-    for (const ln of wrapped) {
-      if (curY + lineH > pageH - margin) {
-        doc.addPage();
-        newPage();
-        curY = margin + style.size;
-      }
-      doc.text(ln, margin + style.indent, curY);
-      curY += lineH;
+    doc.setFont('Courier',style.bold?'bold':'normal');
+    doc.setTextColor(style.r,style.g,style.b);
+    const lineH=style.size*lineSpacing;
+    for(const ln of doc.splitTextToSize(text,usableW)) {
+      if(curY>pageH-mY) newPage();
+      doc.text(ln,mX+indent,curY);
+      curY+=lineH;
     }
   }
 
-  let lastType = null;
-  for (const line of lines) {
-    const type = smartFormat ? classifyLine(line.text || '', line.x || 0) : 'action';
-    if (type === 'blank') { curY += fontSize * 0.55; continue; }
-    if ((type === 'scene' && lastType !== null) ||
-        (type === 'character' && lastType && lastType !== 'parenthetical') ||
-        (lastType === 'dialogue' && type === 'action')) {
-      curY += fontSize * 0.9;
-    }
-    addText((line.text || '').trim(), styleMap[type]);
-    lastType = type;
-  }
+  let lastType=null;
+  for(const line of lines) {
+    const raw=(line.str||'').trim();
+    const xNorm=line.pageW>0?line.x/line.pageW:0;
+    const type=smartFormat?classify(raw,xNorm):(raw?'action':'blank');
 
+    if(!raw||type==='blank') {
+      if(lastType&&lastType!=='blank') curY+=fontSize*0.5;
+      lastType='blank'; continue;
+    }
+
+    // Spacing between blocks
+    if(type==='scene'&&lastType&&lastType!=='blank')       curY+=fontSize*1.2;
+    else if(type==='character'&&lastType==='action')       curY+=fontSize*0.8;
+    else if(lastType==='dialogue'&&type==='action')        curY+=fontSize*0.6;
+
+    putText(raw,styles[type]);
+    lastType=type;
+  }
   return doc;
 }
 
-// ── Main convert ─────────────────────────────────────────
-async function startConvert() {
-  if (!pdfFile) return;
-  const btn = document.getElementById('convert-btn');
-  btn.disabled = true;
-  document.getElementById('dl-btn').style.display = 'none';
+// ── Go ───────────────────────────────────────────────────
+async function go() {
+  if(!pdfFile) return;
+  const btn=document.getElementById('go-btn');
+  btn.disabled=true;
+  document.getElementById('dl-btn').style.display='none';
   clearLog();
-  outputBlob = null;
 
-  const fontSize    = parseInt(document.getElementById('opt-fontsize').value);
-  const pageSizeKey = document.getElementById('opt-pagesize').value;
-  const lineSpacing = parseFloat(document.getElementById('opt-spacing').value);
-  const smartFormat = document.getElementById('opt-smart').checked;
-  const useOCR      = document.getElementById('opt-ocr').checked;
+  const fontSize    =parseInt(document.getElementById('s-size').value);
+  const pageSizeKey =document.getElementById('s-page').value;
+  const lineSpacing =parseFloat(document.getElementById('s-space').value);
+  const smartFormat =document.getElementById('s-smart').checked;
+  const useOCR      =document.getElementById('s-ocr').checked;
 
   try {
-    log('Loading PDF...');
-    setProgress(2);
-    const buf = await pdfFile.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-    const n = pdf.numPages;
-    log('Found ' + n + ' pages.');
+    logMsg('Loading PDF…'); setProg(2);
+    const pdf=await pdfjsLib.getDocument({data:await pdfFile.arrayBuffer()}).promise;
+    const n=pdf.numPages;
+    logMsg('Found '+n+' page'+(n!==1?'s':'')+'.');
 
-    let allLines = [];
+    let allLines=[];
 
-    if (useOCR) {
-      const model = getLMSModel();
-      if (!model) throw new Error('No vision model set in LM Studio config.');
-
-      for (let p = 1; p <= n; p++) {
-        setProgress(5 + (p/n)*80);
-        const page = await pdf.getPage(p);
-        const scanned = await isScannedPage(page);
-
-        if (scanned) {
-          log('Page ' + p + '/' + n + ' — image, using OCR...');
-          const imgData = await renderPageToImage(page);
-          const ocrText = await ocrPage(imgData, p, n);
-          allLines = allLines.concat(parseOcrText(ocrText));
+    if(useOCR) {
+      if(!lmsModel()) throw new Error('No vision model set — enter one above.');
+      for(let p=1;p<=n;p++) {
+        setProg(5+(p/n)*82);
+        const page=await pdf.getPage(p);
+        if(await isScanned(page)) {
+          allLines=allLines.concat(parseOcr(await ocrPage(await pageToImg(page),p,n)));
         } else {
-          log('Page ' + p + '/' + n + ' — text, extracting directly...');
-          const vp = page.getViewport({ scale: 1 });
-          const content = await page.getTextContent();
-          const h = vp.height;
-          const items = content.items
-            .filter(i => i.str.trim())
-            .map(i => ({ text: i.str, x: i.transform[4], y: h - i.transform[5] }))
-            .sort((a,b) => a.y - b.y || a.x - b.x);
-          const grouped = [];
-          for (const item of items) {
-            const last = grouped[grouped.length-1];
-            if (last && Math.abs(last.y - item.y) < 3) { last.text += item.text; }
-            else grouped.push({ ...item });
-          }
-          allLines = allLines.concat(grouped);
+          logMsg('Page '+p+'/'+n+' — text, extracting…');
+          const vp=page.getViewport({scale:1});
+          const tc=await page.getTextContent();
+          const items=tc.items.filter(i=>i.str&&i.str.trim())
+            .map(i=>({str:i.str,x:i.transform[4],y:vp.height-i.transform[5],pageW:vp.width}))
+            .sort((a,b)=>a.y-b.y||a.x-b.x);
+          const rows=[];
+          for(const item of items){const last=rows[rows.length-1];if(last&&Math.abs(last.y-item.y)<6){last.str+=item.str;}else rows.push({...item});}
+          allLines=allLines.concat(rows);
         }
-        allLines.push({ text: '', x: 0 }); // page break spacing
+        allLines.push({str:'',x:0,pageW:612});
       }
     } else {
-      allLines = await extractTextPDF(pdf);
+      allLines=await extractText(pdf);
     }
 
-    log('Building Kindle PDF...');
-    setProgress(90);
-    const doc = buildPDF(allLines, fontSize, pageSizeKey, lineSpacing, smartFormat);
-    outputBlob = doc.output('blob');
-    const origName = pdfFile.name.replace(/\.pdf$/i, '');
+    logMsg('Building PDF…'); setProg(92);
+    const doc=buildPDF(allLines,fontSize,pageSizeKey,lineSpacing,smartFormat);
+    outBlob=doc.output('blob');
+    const name=pdfFile.name.replace(/\.pdf$/i,'')+'_kindle.pdf';
 
-    const dlBtn = document.getElementById('dl-btn');
-    dlBtn.style.display = 'block';
-    dlBtn.textContent = '⬇ Download — ' + origName + '_kindle.pdf';
-    dlBtn.onclick = () => {
-      const url = URL.createObjectURL(outputBlob);
-      const a = document.createElement('a');
-      a.href = url; a.download = origName + '_kindle.pdf';
-      a.click(); URL.revokeObjectURL(url);
+    const dlBtn=document.getElementById('dl-btn');
+    dlBtn.style.display='block';
+    dlBtn.textContent='⬇  Download — '+name;
+    dlBtn.onclick=()=>{
+      const url=URL.createObjectURL(outBlob);
+      const a=document.createElement('a');
+      a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
     };
-
-    setProgress(100);
-    log('Done — ' + doc.getNumberOfPages() + ' pages. Ready to download.', 'ok');
+    setProg(100);
+    logMsg('Done — '+doc.getNumberOfPages()+' pages.',  'ok');
   } catch(err) {
-    log('Error: ' + err.message, 'err');
+    logMsg(err.message,'er');
     console.error(err);
   }
-  btn.disabled = false;
+  btn.disabled=false;
 }
 </script>
 </body>
