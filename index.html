@@ -275,17 +275,34 @@ function groupLines(items, vp) {
 function classify(text, xNorm) {
   const t=text.trim();
   if(!t) return 'blank';
+  
+  // 1. Remove brackets/notes
   const clean = t.replace(/\[\[.*?\]\]/g, '').trim();
   if(!clean) return 'blank';
   
   const allCaps = clean === clean.toUpperCase() && /[A-Z]/.test(clean);
   
-  if(allCaps && /^(INT|EXT|INT\.\/EXT|EXT\.\/INT|I\/E)[\.\s\-]/.test(clean)) return 'scene';
-  if(allCaps && /^(FADE (IN|OUT)|CUT TO|DISSOLVE TO|SMASH CUT|MATCH CUT|INTERCUT|TITLE CARD|THE END|OVER BLACK)/.test(clean)) return 'transition';
-  // Character name (allows parentheses for (O.S.), (V.O.), (CONT'D), ages, etc.)
-  if(allCaps && clean.length < 50 && !/^\d+$/.test(clean) && xNorm > 0.15 && xNorm < 0.80) return 'character';
+  // 2. Transitions (All caps, ends in colon) -> CUT TO:, FADE OUT:
+  if(allCaps && clean.endsWith(':')) return 'transition';
+  
+  // 3. Scene Headers (Standard + Acts + Cold Open)
+  // Strip leading scene numbers (e.g. "2 INT...") for detection, but keep text for now
+  const sceneRegex = /^(INT|EXT|I\/E|COLD OPEN|ACT (ONE|TWO|THREE|FOUR|FIVE)|TITLE CARD)/;
+  if(allCaps && sceneRegex.test(clean)) return 'scene';
+  
+  // 4. Character Names
+  // Must be all caps, reasonable length, no punctuation at end (except O.S/V.O which are usually in parens)
+  // Indentation check helps distinguish from action
+  if(allCaps && clean.length < 40 && !/[.!?]/.test(clean) && xNorm > 0.15 && xNorm < 0.80) return 'character';
+  
+  // 5. Parentheticals
   if(clean.startsWith('(') && clean.endsWith(')') && xNorm > 0.10) return 'parenthetical';
-  if(xNorm > 0.10 && xNorm < 0.80 && !allCaps) return 'dialogue';
+  
+  // 6. Dialogue vs Action
+  // If indented, it's dialogue (even if all caps shouting)
+  // If flush left, it's action
+  if(xNorm > 0.12) return 'dialogue';
+  
   return 'action';
 }
 
@@ -359,27 +376,36 @@ function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'pt',format:[pageW,pageH]});
 
+  // Styles: Action full width, Dialogue narrower/indented
   const styles={
-    scene:        {size:fontSize,   bold:true, indentFrac:0,    r:0,  g:0,  b:0  },
-    character:    {size:fontSize,   bold:true, indentFrac:0.30, r:0,  g:0,  b:0  },
-    parenthetical:{size:fontSize-1,bold:false,indentFrac:0.20, r:70, g:70, b:70 },
-    dialogue:     {size:fontSize,   bold:false,indentFrac:0.13, r:0,  g:0,  b:0  },
-    transition:   {size:fontSize-1,bold:false,indentFrac:0.55, r:70, g:70, b:70 },
-    action:       {size:fontSize,   bold:false,indentFrac:0,    r:0,  g:0,  b:0  },
+    scene:        {size:fontSize,   bold:true, indentFrac:0,    widthFrac:1.0,  r:0,  g:0,  b:0  },
+    character:    {size:fontSize,   bold:true, indentFrac:0.25, widthFrac:0.5,  r:0,  g:0,  b:0  },
+    parenthetical:{size:fontSize-1,bold:false,indentFrac:0.30, widthFrac:0.4,  r:70, g:70, b:70 },
+    dialogue:     {size:fontSize,   bold:false,indentFrac:0.20, widthFrac:0.6,  r:0,  g:0,  b:0  },
+    transition:   {size:fontSize-1,bold:false,indentFrac:0.60, widthFrac:0.4,  r:70, g:70, b:70 }, // Right aligned via high indent
+    action:       {size:fontSize,   bold:false,indentFrac:0,    widthFrac:1.0,  r:0,  g:0,  b:0  },
   };
 
   let curY=mY+fontSize;
   function newPage(){doc.addPage();curY=mY+fontSize;}
   
   function putText(text,style) {
-    const indent=cW*style.indentFrac, usableW=cW-indent;
+    const indent=cW*style.indentFrac;
+    const usableW=cW*style.widthFrac;
+    
     doc.setFontSize(style.size);
     doc.setFont('Courier',style.bold?'bold':'normal');
     doc.setTextColor(style.r,style.g,style.b);
     const lineH=style.size*lineSpacing;
+    
+    // For transitions, we want them right aligned. 
+    // The style indentFrac pushes them right, but we need to ensure text starts there.
+    // Actually, standard screenplay transitions are flush right. 
+    // If indentFrac is 0.6, and width is 0.4, it sits on the right side.
+    
     for(const ln of doc.splitTextToSize(text,usableW)) {
       if(curY>pageH-mY) newPage();
-      doc.text(ln,mX+indent,curY);
+      doc.text(ln, mX+indent, curY);
       curY+=lineH;
     }
   }
@@ -397,7 +423,8 @@ function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
 
   for(const line of lines) {
     let raw=(line.str||'').trim();
-    // Remove PDF artifacts like bookmarks/comments
+    
+    // Remove PDF artifacts
     raw = raw.replace(/\[\[.*?\]\]/g, '').trim();
     
     if(!raw) {
@@ -414,21 +441,30 @@ function buildPDF(lines,fontSize,pageSizeKey,lineSpacing,smartFormat) {
     const xNorm=line.pageW>0?line.x/line.pageW:0;
     const type=smartFormat?classify(raw,xNorm):'action';
 
-    // Scene headings often have stray page numbers at the start in bad PDFs, strip them
+    // Strip leading scene numbers (e.g. "2 INT...")
     if(type==='scene') {
-      raw = raw.replace(/^\d+\s*/, '');
+      raw = raw.replace(/^\d+\s+/, '');
     }
 
     if(type === currentType) {
-      // Group consecutive lines of the same type into a paragraph
+      // Group consecutive lines of the same type
       currentText += ' ' + raw;
     } else {
       flush();
-      // Vertical spacing between different block types
-      if(type==='scene' && lastType && lastType !== 'blank') curY += fontSize * 1.2;
-      else if(type==='character' && lastType==='action') curY += fontSize * 0.8;
-      else if(lastType==='dialogue' && type==='action') curY += fontSize * 0.6;
-      else if(lastType && lastType !== 'blank') curY += fontSize * 0.4;
+      
+      // Spacing Logic
+      // 1. Scene headers get big gap
+      if(type==='scene' && lastType && lastType !== 'blank') curY += fontSize * 1.5;
+      
+      // 2. Character names get gap if coming from action/dialogue
+      else if(type==='character' && (lastType==='action' || lastType==='dialogue' || lastType==='transition')) curY += fontSize * 1.0;
+      
+      // 3. Dialogue gets gap ONLY if coming from Action or Transition (new block)
+      // NO GAP if coming from Character or Parenthetical (immediate response)
+      else if(type==='dialogue' && (lastType==='action' || lastType==='transition')) curY += fontSize * 0.8;
+      
+      // 4. Default small gap for other transitions
+      else if(lastType && lastType !== 'blank') curY += fontSize * 0.2;
 
       currentType = type;
       currentText = raw;
