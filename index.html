@@ -221,138 +221,223 @@ function setProg(pct){document.getElementById('prog').style.display='block';docu
 
 const PAGE_SIZES={kindle:[338,468],a5:[420,595],a4:[595,842]};
 
-// ── CHARACTER NAME PATTERN ────────────────────────────────
-// Matches: NAME, NAME (V.O.), NAME (O.S.), NAME (CONT'D), etc.
-// Must be ALL CAPS, 1-4 words, optionally followed by parenthetical qualifier
-const CHAR_PAT = /^([A-Z][A-Z0-9 '']{0,30})(\s*\([^)]{1,30}\))?$/;
+// ── PATTERNS ─────────────────────────────────────────────
 
-// Scene heading patterns
-const SCENE_PAT = /^(\d+\s+)?(INT|EXT|I\/E|EXT\/INT|INT\.\/EXT\.|COLD OPEN|ACT (ONE|TWO|THREE|FOUR|FIVE|\d)|FADE IN|TAG|TEASER|EPILOGUE)/;
+// Character name: ALL CAPS, 1-5 words, no trailing period
+// Does NOT match if it contains digits followed by spaces (scene numbers)
+const CHAR_CORE = /^[A-Z][A-Z0-9]*([ '][A-Z][A-Z0-9]*){0,4}$/;
 
-// Transition patterns  
-const TRANS_PAT = /^(FADE OUT|FADE IN|CUT TO|DISSOLVE TO|SMASH CUT|MATCH CUT|WIPE TO|INTERCUT|THE END|BACK TO|TITLE CARD|WHIP PAN)\b/;
+// Inline qualifier after character name: (V.O.), (O.S.), (CONT'D), (CONTD), etc.
+const QUALIFIER_PAT = /^\((V\.?O\.?|O\.?S\.?|CONT'?D|VOICE OVER|OFF SCREEN|PRE-LAP|FILTERED)\)$/i;
+
+// Scene heading: starts with optional number then INT/EXT/I-E etc.
+const SCENE_PAT = /^(\d+\s+)?(INT|EXT|I\/E|EXT\/INT|INT\.\/EXT\.|COLD OPEN|ACT (ONE|TWO|THREE|FOUR|FIVE|\d+)|FADE IN:|TAG|TEASER|EPILOGUE)\b/i;
+
+// Transition: specific known transitions
+const TRANS_PAT = /^(FADE OUT[.:]?|FADE TO BLACK[.:]?|CUT TO[.:]?|DISSOLVE TO[.:]?|SMASH CUT[.:]?|MATCH CUT[.:]?|WIPE TO[.:]?|INTERCUT|THE END|BACK TO[.:]?|WHIP PAN[.:]?|TITLE CARD[.:]?|CONTINUOUS[.:]?|SAME[.:]?)\s*$/i;
+
+// Words that look all-caps but are NOT character names — scene/action words
+// that commonly appear mid-line in this script style
+const NOT_A_NAME = new Set([
+  'INT','EXT','CUT','FADE','DISSOLVE','SMASH','MATCH','WIPE','BACK',
+  'TITLE','WHIP','PAN','CONTINUOUS','SAME','THE','AND','BUT','FOR',
+  'WITH','FROM','INTO','ONTO','OVER','UNDER','THROUGH','UPON',
+  'MORE','CONT','CONTD','VO','OS','POV','INSERT','CLOSE','WIDE',
+  'MEDIUM','ANGLE','SHOT','SERIES','MONTAGE','SEGMENT','END','BEGIN',
+  'ACT','TAG','COLD','OPEN','SCENE','NOTE','BEAT','BEAT.','SFX',
+  'MOS','VFX','FX','BGD','BG','FG','OC','OS','SUPER','TITLE',
+  'GRAPHIC','TEXT','CARD','CONTINUED','OMITTED','REVISED',
+  'DRAFT','PRODUCTION','EPISODE','PILOT','NETWORK',
+]);
+
+// Returns true if a word/phrase could be a character name
+function looksLikeName(candidate) {
+  const words = candidate.trim().split(/\s+/);
+  // Reject if any word is in the exclusion list
+  if (words.some(w => NOT_A_NAME.has(w.replace(/[^A-Z]/g,''))) ) return false;
+  // Reject if it contains numbers (scene numbers like "1" or "22")
+  if (/\d/.test(candidate)) return false;
+  // Must match the core pattern
+  return CHAR_CORE.test(candidate.trim());
+}
 
 // ── SEGMENT SPLITTER ──────────────────────────────────────
-// This is the key function for scripts like Good Boy where action
-// and character names are concatenated on the same extracted line.
-// e.g. "CLARENCE I can speak. DRIVER Cool, get out of my van."
-// We split this into: ["CLARENCE", "I can speak.", "DRIVER", "Cool, get out of my van."]
+// Splits a raw extracted line into typed segments.
+// Handles the key problem: "CLARENCE I can speak. DRIVER Cool, get out."
+// → [{hint:'character', text:'CLARENCE'}, {hint:'run', text:'I can speak.'}, ...]
+//
+// Also handles action lines mid-dialogue:
+// "Sure. Evan gulps as he realizes..." after dialogue → the non-dialogue part 
+// needs to break out as action. We detect this by looking for sentences that
+// start with a proper noun or mixed-case verb followed by more mixed-case text.
 
 function splitSegments(rawLine) {
-  // First check if the whole line is a special type — if so, don't split
   const t = rawLine.trim();
   if (!t) return [{ text: '', hint: 'blank' }];
+
+  // Whole-line special cases first
   if (SCENE_PAT.test(t)) return [{ text: t, hint: 'scene' }];
   if (TRANS_PAT.test(t)) return [{ text: t, hint: 'transition' }];
   if (t.startsWith('(') && t.endsWith(')')) return [{ text: t, hint: 'parenthetical' }];
+  // Lone qualifier like (V.O.) on its own line → attach to prev character (handled in parseIntoBlocks)
+  if (QUALIFIER_PAT.test(t)) return [{ text: t, hint: 'qualifier' }];
 
-  // Tokenise on boundaries before ALL-CAPS words that look like character names.
-  // Strategy: scan word by word, when we see a run of ALL-CAPS words that match
-  // the character name pattern AND are followed by lowercase text, that's a split point.
   const words = t.split(/\s+/);
   const segments = [];
   let i = 0;
 
   while (i < words.length) {
-    // Try to grab a character name starting at position i
-    // Character names are 1–4 consecutive all-caps words
+    // ── Try to find a character name at position i ──
+    // Try longest match first (up to 4 words)
     let nameFound = false;
-    for (let nameLen = 4; nameLen >= 1; nameLen--) {
-      if (i + nameLen > words.length) continue;
+
+    for (let nameLen = Math.min(4, words.length - i); nameLen >= 1; nameLen--) {
       const candidate = words.slice(i, i + nameLen).join(' ');
-      if (!CHAR_PAT.test(candidate)) continue;
-      // Check what follows: if nothing, or next word is lowercase/mixed, it's a name
-      const nextIdx = i + nameLen;
-      // Optionally consume a trailing parenthetical like (V.O.) or (CONT'D)
+      if (!looksLikeName(candidate)) continue;
+
       let nameStr = candidate;
-      let consumedExtra = 0;
-      if (nextIdx < words.length && words[nextIdx].startsWith('(')) {
-        // find closing paren
-        let parenBuf = '';
-        let j = nextIdx;
-        while (j < words.length) {
-          parenBuf += (parenBuf ? ' ' : '') + words[j];
-          j++;
-          if (words[j-1].endsWith(')')) break;
+      let consumed = i + nameLen;
+
+      // Optionally consume an inline qualifier: (V.O.) (CONT'D) etc.
+      if (consumed < words.length) {
+        // Build potential paren token(s)
+        let parenBuf = words[consumed];
+        if (parenBuf.startsWith('(')) {
+          let j = consumed;
+          let buf = '';
+          while (j < words.length) {
+            buf += (buf ? ' ' : '') + words[j];
+            j++;
+            if (words[j-1].endsWith(')')) break;
+          }
+          if (QUALIFIER_PAT.test(buf)) {
+            nameStr = candidate + ' ' + buf;
+            consumed = j;
+          }
         }
-        nameStr = candidate + ' ' + parenBuf;
-        consumedExtra = j - nextIdx;
       }
-      const afterName = i + nameLen + consumedExtra;
-      // Accept as character name if:
-      // - it's the whole remaining text (standalone name line), OR
-      // - the next word starts with a non-caps letter (dialogue follows), OR
-      // - afterName is at end
-      if (afterName >= words.length) {
+
+      // Now decide: is what follows this candidate consistent with it being a name?
+      if (consumed >= words.length) {
+        // Candidate is the entire rest — it's a standalone name line
         segments.push({ text: nameStr, hint: 'character' });
-        i = afterName;
+        i = consumed;
         nameFound = true;
         break;
       }
-      const nextWord = words[afterName];
-      const nextIsLower = /^[a-z"'(\[]/.test(nextWord);
-      const nextIsCaps = nextWord === nextWord.toUpperCase() && /[A-Z]/.test(nextWord);
-      // If the next word is lowercase/mixed, this is a character name followed by dialogue
-      if (nextIsLower) {
+
+      const nextWord = words[consumed];
+      const nextIsLower   = /^[a-z"'(\[…]/.test(nextWord);
+      const nextIsMixed   = /[a-z]/.test(nextWord) && /[A-Z]/.test(nextWord);
+
+      if (nextIsLower || nextIsMixed) {
+        // Name followed by dialogue/action text
         segments.push({ text: nameStr, hint: 'character' });
-        i = afterName;
+        i = consumed;
         nameFound = true;
         break;
       }
-      // If next word is all-caps too, don't treat this as a character name yet —
-      // could be part of an action line or a scene heading
+      // Next word is also all-caps → this might be part of a scene heading or action,
+      // don't claim it as a character name yet; try shorter nameLen or fall through
     }
 
     if (!nameFound) {
-      // Consume words until we hit what looks like another character name boundary
-      // Collect into an action/dialogue run
+      // ── Consume a run of non-name words ──
+      // Stop when we hit a character name boundary (all-caps word followed by lower)
       let run = [];
       while (i < words.length) {
-        // Look ahead: is there a character name break coming?
-        let foundBreak = false;
-        for (let nameLen = 4; nameLen >= 1; nameLen--) {
-          if (i + nameLen > words.length) continue;
-          const candidate = words.slice(i, i + nameLen).join(' ');
-          if (!CHAR_PAT.test(candidate)) continue;
-          const afterIdx = i + nameLen;
-          if (afterIdx >= words.length) break; // end of line, not a mid-line break
-          const nextWord = words[afterIdx];
-          const nextIsLower = /^[a-z"'(\[]/.test(nextWord);
-          if (nextIsLower) {
-            // This is a mid-line character name break — stop the run here
-            foundBreak = true;
-            break;
+        let breakAhead = false;
+        for (let nl = Math.min(4, words.length - i); nl >= 1; nl--) {
+          const cand = words.slice(i, i + nl).join(' ');
+          if (!looksLikeName(cand)) continue;
+          const after = i + nl;
+          if (after >= words.length) break;
+          // Peek past optional qualifier
+          let peekAt = after;
+          if (words[peekAt] && words[peekAt].startsWith('(')) {
+            let buf='', j=peekAt;
+            while(j<words.length){buf+=(buf?' ':'')+words[j];j++;if(words[j-1].endsWith(')'))break;}
+            if(QUALIFIER_PAT.test(buf)) peekAt=j;
+          }
+          if (peekAt >= words.length) break;
+          const nw = words[peekAt];
+          if (/^[a-z"'(\[…]/.test(nw) || (/[a-z]/.test(nw) && /[A-Z]/.test(nw))) {
+            breakAhead = true; break;
           }
         }
-        if (foundBreak) break;
-        run.push(words[i]);
-        i++;
+        if (breakAhead) break;
+        run.push(words[i++]);
       }
-      if (run.length) {
-        segments.push({ text: run.join(' '), hint: 'action' });
-      }
+      if (run.length) segments.push({ text: run.join(' '), hint: 'run' });
     }
   }
 
-  return segments.length ? segments : [{ text: t, hint: 'action' }];
+  return segments.length ? segments : [{ text: t, hint: 'run' }];
+}
+
+// ── ACTION vs DIALOGUE heuristic ─────────────────────────
+// Given a text segment and the current state, determine if it's
+// action (stage direction) or dialogue.
+//
+// Key insight: action/stage direction in this script style tends to be
+// a complete sentence with a subject (often a name like "Evan gulps...")
+// or a description. Dialogue is usually a direct speech fragment.
+//
+// We use several signals:
+// 1. Does it start with a known character's name followed by a verb? → action
+// 2. Does it contain a sentence-ending period followed by a capital + more text? → likely mixed action
+// 3. Is the state 'dialogue' and the text short with no period? → probably dialogue continuation
+// 4. Otherwise in dialogue state: it's dialogue unless it reads like a stage direction
+
+function isLikelyAction(text, state) {
+  const t = text.trim();
+  if (!t) return false;
+
+  // Always action if coming from action state
+  if (state === 'action' || state === 'transition' || state === 'scene') return true;
+
+  // Short exclamations without periods mid-dialogue are dialogue
+  if (t.length < 40 && !/[A-Z][a-z]+ [a-z]/.test(t) && state === 'dialogue') return false;
+
+  // Heuristic: if the text starts with a capitalised word (proper noun / name)
+  // followed by a lowercase verb word, it's likely a stage direction
+  // e.g. "Evan gulps", "The board erupts", "Reporter starts running"
+  if (/^[A-Z][a-z]+( [A-Z][a-z]+)* [a-z]/.test(t)) return true;
+
+  // Contains a sentence boundary (period/! followed by capital) suggesting
+  // mid-sentence action insertion
+  if (/[.!?]\s+[A-Z]/.test(t) && state === 'dialogue') {
+    // But not if it's just dialogue ending with ! or ? before next sentence of dialogue
+    // Stage directions don't usually end with ?
+    if (!/^[A-Z][a-z]/.test(t.split(/[.!?]\s+/)[1] || '')) return false;
+    return true;
+  }
+
+  return false;
 }
 
 // ── CLASSIFY a segment ───────────────────────────────────
-// Uses the hint from the splitter + context state
-// state: 'action' | 'character' | 'dialogue' | 'parenthetical'
 function classifySegment(seg, state) {
   if (seg.hint === 'blank')         return 'blank';
   if (seg.hint === 'scene')         return 'scene';
   if (seg.hint === 'transition')    return 'transition';
   if (seg.hint === 'parenthetical') return 'parenthetical';
+  if (seg.hint === 'qualifier')     return 'qualifier'; // handled specially in parseIntoBlocks
   if (seg.hint === 'character')     return 'character';
 
-  // For 'action' hints: use state to decide if it's actually dialogue
-  // If last real element was character or parenthetical, this is dialogue
-  if (state === 'character' || state === 'parenthetical' || state === 'dialogue') {
-    // It's dialogue — unless it looks like a stage direction mixed in
+  // 'run' hint: could be action or dialogue depending on state and content
+  if (state === 'character' || state === 'parenthetical') {
+    // Immediately after a character name: it's dialogue
     return 'dialogue';
   }
+
+  if (state === 'dialogue') {
+    // We're in dialogue — is this a stage direction breaking in?
+    if (isLikelyAction(seg.text, state)) return 'action';
+    return 'dialogue';
+  }
+
+  // Default: action
   return 'action';
 }
 
@@ -375,34 +460,51 @@ function groupRawLines(items, vp) {
 }
 
 // ── PARSE LINES INTO TYPED BLOCKS ───────────────────────
-// Takes raw extracted rows and returns [{type, text}]
 function parseIntoBlocks(rawLines) {
   const blocks = [];
-  let state = 'action'; // tracks what we last emitted
+  let state = 'action';
 
   for (const row of rawLines) {
     const t = (row.str || '').trim();
 
-    // Blank / page break
     if (!t) {
+      // A blank line always resets state to action (new paragraph)
+      if (state === 'dialogue') state = 'action';
       blocks.push({ type: 'blank', text: '' });
       continue;
     }
 
-    // Skip lone page numbers
-    if (/^\d+$/.test(t)) continue;
+    // Skip lone page numbers (possibly with a trailing scene number)
+    if (/^\d+\.?\s*\d*$/.test(t)) continue;
 
-    // Split the line into segments
     const segs = splitSegments(t);
 
     for (const seg of segs) {
       if (!seg.text.trim()) continue;
+
+      // ── Qualifier: (V.O.) / (CONT'D) on its own line → append to last character block
+      if (seg.hint === 'qualifier') {
+        const last = blocks[blocks.length - 1];
+        if (last && last.type === 'character') {
+          last.text += ' ' + seg.text;
+        }
+        // Don't change state
+        continue;
+      }
+
       const type = classifySegment(seg, state);
       if (type === 'blank') { blocks.push({ type: 'blank', text: '' }); continue; }
 
-      // Merge consecutive blocks of the same type (except blanks/scenes)
+      // When we emit an action block, reset state so subsequent lines don't
+      // inherit dialogue state
+      if (type === 'action') state = 'action';
+
+      // Merge consecutive same-type blocks (not scene/transition/character — those stay separate)
       const last = blocks[blocks.length - 1];
-      if (last && last.type === type && type !== 'scene' && type !== 'transition' && type !== 'character') {
+      const canMerge = last && last.type === type
+        && type !== 'scene' && type !== 'transition' && type !== 'character' && type !== 'blank';
+
+      if (canMerge) {
         last.text += ' ' + seg.text;
       } else {
         blocks.push({ type, text: seg.text });
