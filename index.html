@@ -223,9 +223,11 @@ const SCENE_RE=/^(\d*\s*)?(INT|EXT|I\/E|EXT\/INT|INT\.\/EXT\.|COLD\s*OPEN|ACT\s*
 const TRANS_RE=/^(FADE\s*(OUT|TO\s*BLACK)|CUT\s*TO|DISSOLVE\s*TO|SMASH\s*CUT|MATCH\s*CUT|WIPE\s*TO|INTERCUT|THE\s*END|BACK\s*TO|WHIP\s*PAN|TITLE\s*CARD|CONTINUOUS|OVER\s*BLACK)\s*[.:]?\s*$/i;
 
 // ── AUTO-DETECT X THRESHOLDS FROM PDF ────────────────────
-// Proper screenplays have 3-4 distinct x positions. We detect them
-// automatically so this works for any page size or margin setting.
-// Returns {actionMax, dialogueMax} — midpoints between the clusters.
+// Screenplays have 3-4 distinct x positions (action, dialogue, character, transition).
+// Some scripts also have scene numbers creating an extra far-left cluster.
+// We detect thresholds by finding the most frequent body cluster = action,
+// then assigning dialogue and character from clusters to its right.
+// This is robust to scene-numbered scripts where a naive leftmost=action breaks.
 function detectThresholds(rawLines, pageWidth) {
   const xCounts={};
   for(const row of rawLines){
@@ -233,31 +235,45 @@ function detectThresholds(rawLines, pageWidth) {
     const xr=Math.round(row.x/3)*3; // snap to 3pt grid
     xCounts[xr]=(xCounts[xr]||0)+1;
   }
-  // Filter noise, merge nearby clusters
-  const clusters=Object.entries(xCounts)
+
+  // Build and merge clusters
+  const raw=Object.entries(xCounts)
     .filter(([,c])=>c>=2)
-    .map(([x])=>parseFloat(x))
-    .sort((a,b)=>a-b);
-  
+    .map(([x,c])=>({x:parseFloat(x),c}))
+    .sort((a,b)=>a.x-b.x);
+
+  // Merge clusters within 12pt of each other
   const merged=[];
-  for(const x of clusters){
-    if(merged.length&&x-merged[merged.length-1]<12) continue; // merge close values
-    merged.push(x);
+  for(const {x,c} of raw){
+    const last=merged[merged.length-1];
+    if(last&&x-last.x<12){ last.c+=c; } // accumulate count into lower cluster
+    else merged.push({x,c});
   }
-  
-  // Split into body (action/dialogue/character) and transition (rightmost, >60% of width)
-  const body=merged.filter(x=>x/pageWidth<0.60);
-  
-  // We need at least action + dialogue + character = 3 clusters
-  // If we have fewer, use percentage-based fallback
+
+  // Split: body = left 62% of page (action/dialogue/character); rest = transition zone
+  const body=merged.filter(m=>m.x/pageWidth<0.62);
+
   if(body.length<2){
+    // Fallback: percentage-based (works for standard US Letter)
     return{actionMax:pageWidth*0.22,dialogueMax:pageWidth*0.36};
   }
-  
-  const midpoint=(a,b)=>(a+b)/2;
+
+  // KEY FIX: Find the action cluster by frequency, not position.
+  // Action lines are the most common, so the most frequent cluster = action.
+  // This correctly handles scripts with scene numbers (extra cluster at far left
+  // with low frequency that would otherwise be mistaken for the action column).
+  const mostFrequent=body.reduce((a,b)=>b.c>a.c?b:a);
+  const actionX=mostFrequent.x;
+
+  // Dialogue and character are the next clusters to the RIGHT of action, by position
+  const right=body.filter(m=>m.x>actionX+6).sort((a,b)=>a.x-b.x);
+  const dialogueX=right[0]?right[0].x:actionX*1.65;
+  const characterX=right[1]?right[1].x:actionX*2.33;
+
+  const mid=(a,b)=>(a+b)/2;
   return{
-    actionMax:  body.length>=2 ? midpoint(body[0],body[1]) : pageWidth*0.22,
-    dialogueMax:body.length>=3 ? midpoint(body[1],body[2]) : pageWidth*0.36,
+    actionMax:  mid(actionX,dialogueX),
+    dialogueMax:mid(dialogueX,characterX),
   };
 }
 
