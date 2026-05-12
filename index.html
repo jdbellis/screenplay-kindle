@@ -10,63 +10,63 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f7f5f0; --bg2: #ffffff; --bg3: #f0ece3;
-  --border: #d8d2c4; --border2: #c4bca8;
-  --text: #1a1814; --muted: #7a7060;
-  --accent: #8b4513; --accent2: #a0522d;
-  --danger: #c0392b; --success: #27ae60;
-  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+  --bg:#f7f5f0;--bg2:#ffffff;--bg3:#f0ece3;
+  --border:#d8d2c4;--border2:#c4bca8;
+  --text:#1a1814;--muted:#7a7060;
+  --accent:#8b4513;--accent2:#a0522d;
+  --danger:#c0392b;--success:#27ae60;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
 }
-body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:15px; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:40px 20px 80px; }
-.wrap { width:100%; max-width:620px; }
-h1 { font-family:var(--mono); font-size:20px; font-weight:400; letter-spacing:-0.02em; margin-bottom:4px; }
-h1 span { color:var(--accent); }
-.subtitle { font-size:12px; color:var(--muted); font-family:var(--mono); margin-bottom:36px; }
-.card { background:var(--bg2); border:1px solid var(--border); border-radius:6px; margin-bottom:16px; overflow:hidden; }
-.card-head { padding:10px 16px; border-bottom:1px solid var(--border); font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; display:flex; align-items:center; gap:8px; }
-.dot { width:7px; height:7px; border-radius:50%; background:var(--border2); flex-shrink:0; }
-.dot.ok { background:var(--success); } .dot.err { background:var(--danger); }
-.card-body { padding:14px 16px; }
-.row { display:flex; gap:8px; margin-bottom:8px; }
-.row:last-child { margin-bottom:0; }
-input[type=text] { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:12px; padding:7px 10px; outline:none; }
-input[type=text]:focus { border-color:var(--accent2); }
-input::placeholder { color:var(--border2); }
-.note { font-size:11px; color:var(--muted); line-height:1.6; margin-top:8px; }
-.btn { background:var(--accent); color:#fff; border:none; border-radius:4px; padding:7px 14px; font-family:var(--mono); font-size:12px; font-weight:500; cursor:pointer; white-space:nowrap; transition:opacity .15s; }
-.btn:hover { opacity:.85; }
-.btn.outline { background:transparent; color:var(--accent); border:1px solid var(--accent2); }
-.btn.outline:hover { background:rgba(139,69,19,.06); }
-.btn.big { width:100%; padding:12px; font-size:13px; margin-bottom:10px; display:none; }
-.btn:disabled { opacity:.4; cursor:not-allowed; }
-.drop { border:1.5px dashed var(--border2); border-radius:6px; padding:36px 24px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s; margin-bottom:16px; }
-.drop:hover, .drop.over { border-color:var(--accent2); background:rgba(139,69,19,.03); }
-.drop input { display:none; }
-.drop-icon { font-size:32px; margin-bottom:10px; opacity:.4; }
-.drop-title { font-family:var(--mono); font-size:13px; margin-bottom:3px; }
-.drop-sub { font-size:12px; color:var(--muted); }
-.chip { display:inline-flex; align-items:center; gap:6px; background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:3px 10px; margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--accent); }
-.opt { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; }
-.opt + .opt { border-top:1px solid var(--border); }
-.opt-lbl { font-size:13px; color:var(--muted); }
-.opt-lbl small { display:block; font-size:11px; color:var(--border2); margin-top:1px; }
-select { background:var(--bg3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:12px; padding:5px 8px; outline:none; cursor:pointer; }
-.sw { display:flex; align-items:center; gap:10px; }
-input[type=range] { -webkit-appearance:none; width:80px; height:2px; background:var(--border); border-radius:2px; outline:none; cursor:pointer; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--accent); cursor:pointer; }
-.sv { font-family:var(--mono); font-size:12px; color:var(--accent); min-width:28px; }
-.tog { position:relative; width:34px; height:20px; cursor:pointer; flex-shrink:0; }
-.tog input { display:none; }
-.tog-t { position:absolute; inset:0; background:var(--border); border-radius:10px; transition:background .2s; }
-.tog input:checked + .tog-t { background:var(--accent); }
-.tog-k { position:absolute; top:3px; left:3px; width:14px; height:14px; background:#fff; border-radius:50%; transition:left .2s; }
-.tog input:checked ~ .tog-k { left:17px; }
-.log { background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:12px 16px; margin-bottom:14px; display:none; min-height:48px; }
-.ll { font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9; }
-.ll.hi { color:var(--text); } .ll.ok { color:var(--success); } .ll.er { color:var(--danger); }
-.prog { height:3px; background:var(--border); border-radius:2px; margin-bottom:14px; display:none; overflow:hidden; }
-.prog-fill { height:100%; background:var(--accent); border-radius:2px; width:0%; transition:width .3s; }
-.hint { font-size:12px; color:var(--muted); text-align:center; margin-top:16px; line-height:1.7; font-family:var(--mono); }
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px 80px;}
+.wrap{width:100%;max-width:620px;}
+h1{font-family:var(--mono);font-size:20px;font-weight:400;letter-spacing:-0.02em;margin-bottom:4px;}
+h1 span{color:var(--accent);}
+.subtitle{font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:36px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:16px;overflow:hidden;}
+.card-head{padding:10px 16px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;}
+.dot.ok{background:var(--success);}.dot.err{background:var(--danger);}
+.card-body{padding:14px 16px;}
+.row{display:flex;gap:8px;margin-bottom:8px;}
+.row:last-child{margin-bottom:0;}
+input[type=text]{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 10px;outline:none;}
+input[type=text]:focus{border-color:var(--accent2);}
+input::placeholder{color:var(--border2);}
+.note{font-size:11px;color:var(--muted);line-height:1.6;margin-top:8px;}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:7px 14px;font-family:var(--mono);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn.outline{background:transparent;color:var(--accent);border:1px solid var(--accent2);}
+.btn.outline:hover{background:rgba(139,69,19,.06);}
+.btn.big{width:100%;padding:12px;font-size:13px;margin-bottom:10px;display:none;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.drop{border:1.5px dashed var(--border2);border-radius:6px;padding:36px 24px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:16px;}
+.drop:hover,.drop.over{border-color:var(--accent2);background:rgba(139,69,19,.03);}
+.drop input{display:none;}
+.drop-icon{font-size:32px;margin-bottom:10px;opacity:.4;}
+.drop-title{font-family:var(--mono);font-size:13px;margin-bottom:3px;}
+.drop-sub{font-size:12px;color:var(--muted);}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 10px;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--accent);}
+.opt{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;}
+.opt+.opt{border-top:1px solid var(--border);}
+.opt-lbl{font-size:13px;color:var(--muted);}
+.opt-lbl small{display:block;font-size:11px;color:var(--border2);margin-top:1px;}
+select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:5px 8px;outline:none;cursor:pointer;}
+.sw{display:flex;align-items:center;gap:10px;}
+input[type=range]{-webkit-appearance:none;width:80px;height:2px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;}
+.sv{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:28px;}
+.tog{position:relative;width:34px;height:20px;cursor:pointer;flex-shrink:0;}
+.tog input{display:none;}
+.tog-t{position:absolute;inset:0;background:var(--border);border-radius:10px;transition:background .2s;}
+.tog input:checked+.tog-t{background:var(--accent);}
+.tog-k{position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:left .2s;}
+.tog input:checked~.tog-k{left:17px;}
+.log{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:14px;display:none;min-height:48px;}
+.ll{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.9;}
+.ll.hi{color:var(--text);}.ll.ok{color:var(--success);}.ll.er{color:var(--danger);}
+.prog{height:3px;background:var(--border);border-radius:2px;margin-bottom:14px;display:none;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .3s;}
+.hint{font-size:12px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.7;font-family:var(--mono);}
 </style>
 </head>
 <body>
@@ -121,10 +121,6 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; h
     </select>
   </div>
   <div class="opt">
-    <div class="opt-lbl">Smart formatting<small>Detect scene headings, dialogue, etc.</small></div>
-    <label class="tog"><input type="checkbox" id="s-smart" checked><div class="tog-t"></div><div class="tog-k"></div></label>
-  </div>
-  <div class="opt">
     <div class="opt-lbl">OCR mode<small>For scanned / image-based PDFs</small></div>
     <label class="tog"><input type="checkbox" id="s-ocr"><div class="tog-t"></div><div class="tog-k"></div></label>
   </div>
@@ -142,41 +138,41 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; h
 </div>
 
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-let pdfFile=null, outBlob=null;
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let pdfFile=null,outBlob=null;
 
 // ── Config ───────────────────────────────────────────────
-function loadConfig() {
-  document.getElementById('lms-url').value   = localStorage.getItem('lms_url')   || 'http://localhost:1234';
-  document.getElementById('lms-model').value = localStorage.getItem('lms_model') || '';
+function loadConfig(){
+  document.getElementById('lms-url').value=localStorage.getItem('lms_url')||'http://localhost:1234';
+  document.getElementById('lms-model').value=localStorage.getItem('lms_model')||'';
 }
-function saveConfig() {
-  localStorage.setItem('lms_url',   document.getElementById('lms-url').value.trim().replace(/\/$/,''));
-  localStorage.setItem('lms_model', document.getElementById('lms-model').value.trim());
+function saveConfig(){
+  localStorage.setItem('lms_url',document.getElementById('lms-url').value.trim().replace(/\/$/,''));
+  localStorage.setItem('lms_model',document.getElementById('lms-model').value.trim());
   setDot('ok','Saved ✓');
   setTimeout(()=>setDot(null,'LM Studio — for scanned PDFs only'),2000);
 }
-function lmsUrl()   { return (document.getElementById('lms-url').value.trim()||'http://localhost:1234').replace(/\/$/,''); }
-function lmsModel() { return document.getElementById('lms-model').value.trim()||localStorage.getItem('lms_model')||''; }
-function setDot(cls,msg) { document.getElementById('dot').className='dot'+(cls?' '+cls:''); document.getElementById('dot-lbl').textContent=msg; }
-async function testConn() {
+function lmsUrl(){return(document.getElementById('lms-url').value.trim()||'http://localhost:1234').replace(/\/$/,'');}
+function lmsModel(){return document.getElementById('lms-model').value.trim()||localStorage.getItem('lms_model')||'';}
+function setDot(cls,msg){document.getElementById('dot').className='dot'+(cls?' '+cls:'');document.getElementById('dot-lbl').textContent=msg;}
+async function testConn(){
   setDot(null,'Testing…');
-  try {
+  try{
     const r=await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
     setDot('ok','Connected ✓  '+((d.data||[]).map(m=>m.id).join(', ')||'(no models)').slice(0,55));
-  } catch(e) { setDot('err','Cannot reach LM Studio: '+e.message); }
+  }catch(e){setDot('err','Cannot reach LM Studio: '+e.message);}
 }
-async function listModels() {
-  try {
+async function listModels(){
+  try{
     const r=await fetch(lmsUrl()+'/v1/models',{signal:AbortSignal.timeout(5000)});
     const d=await r.json();
     const ids=(d.data||[]).map(m=>m.id);
     if(!ids.length){alert('No models loaded.');return;}
     const pick=ids.length===1?ids[0]:prompt('Pick a vision model:\n\n'+ids.join('\n'),ids[0]);
     if(pick){document.getElementById('lms-model').value=pick;saveConfig();}
-  } catch(e){alert('Could not reach LM Studio at '+lmsUrl());}
+  }catch(e){alert('Could not reach LM Studio at '+lmsUrl());}
 }
 loadConfig();
 
@@ -187,12 +183,12 @@ drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
 drop.addEventListener('drop',e=>{
   e.preventDefault();drop.classList.remove('over');
   const f=e.dataTransfer.files[0];
-  if(f&&f.type==='application/pdf') setFile(f); else logMsg('Please drop a PDF.','er');
+  if(f&&f.type==='application/pdf')setFile(f);else logMsg('Please drop a PDF.','er');
 });
 fi.addEventListener('change',()=>{if(fi.files[0])setFile(fi.files[0]);});
-document.getElementById('s-size').addEventListener('input',function(){ document.getElementById('s-size-v').textContent=this.value+'pt'; });
-function setFile(f) {
-  pdfFile=f; outBlob=null;
+document.getElementById('s-size').addEventListener('input',function(){document.getElementById('s-size-v').textContent=this.value+'pt';});
+function setFile(f){
+  pdfFile=f;outBlob=null;
   document.getElementById('chip').style.display='inline-flex';
   document.getElementById('chip-name').textContent=f.name+' ('+Math.round(f.size/1024)+' KB)';
   document.getElementById('go-btn').style.display='block';
@@ -202,13 +198,13 @@ function setFile(f) {
 
 // ── Log ──────────────────────────────────────────────────
 let buf=['','',''];
-function clearLog() {
+function clearLog(){
   buf=['','',''];
   ['l1','l2','l3'].forEach(id=>{document.getElementById(id).textContent='';document.getElementById(id).className='ll';});
   document.getElementById('log').style.display='none';
   document.getElementById('prog').style.display='none';
 }
-function logMsg(msg,cls) {
+function logMsg(msg,cls){
   buf=[...buf.slice(1),msg];
   document.getElementById('log').style.display='block';
   ['l1','l2','l3'].forEach((id,i)=>{
@@ -221,351 +217,324 @@ function setProg(pct){document.getElementById('prog').style.display='block';docu
 
 const PAGE_SIZES={kindle:[338,468],a5:[420,595],a4:[595,842]};
 
-// ── X-POSITION CLASSIFIER ────────────────────────────────
-// The PDF has exactly 4 x positions (confirmed by inspection):
-//   ~0.07 = action / scene headings (flush left)
-//   ~0.20 = dialogue (indented)
-//   ~0.33 = character names (centred)
-//   ~0.80 = transitions (right)
-//
-// We classify primarily by x position, using content only as tiebreaker.
-// This is far more reliable than trying to guess from text patterns alone.
+// ── PATTERNS ─────────────────────────────────────────────
+const QUALIFIER_RE=/^\(\s*(V\.?O\.?|O\.?S\.?|CONT'?D|VOICE\s*OVER|OFF\s*SCREEN|PRE-?LAP|FILTERED|DRUNKENLY|WRYLY|QUIETLY|SHOUTING|WHISPERING)\s*\)$/i;
+const SCENE_RE=/^(\d*\s*)?(INT|EXT|I\/E|EXT\/INT|INT\.\/EXT\.|COLD\s*OPEN|ACT\s*(ONE|TWO|THREE|FOUR|FIVE|\d+)|FADE\s*IN\s*:|TAG|TEASER|EPILOGUE|OVER\s*BLACK)\b/i;
+const TRANS_RE=/^(FADE\s*(OUT|TO\s*BLACK)|CUT\s*TO|DISSOLVE\s*TO|SMASH\s*CUT|MATCH\s*CUT|WIPE\s*TO|INTERCUT|THE\s*END|BACK\s*TO|WHIP\s*PAN|TITLE\s*CARD|CONTINUOUS|OVER\s*BLACK)\s*[.:]?\s*$/i;
 
-// These are the thresholds as fractions of page width.
-// We use generous bands so minor font/spacing variation doesn't break it.
-function xBand(xNorm) {
-  if (xNorm > 0.65) return 'right';    // transitions
-  if (xNorm > 0.28) return 'centre';   // character names
-  if (xNorm > 0.14) return 'indent';   // dialogue
-  return 'left';                        // action / scene headings
+// ── AUTO-DETECT X THRESHOLDS FROM PDF ────────────────────
+// Proper screenplays have 3-4 distinct x positions. We detect them
+// automatically so this works for any page size or margin setting.
+// Returns {actionMax, dialogueMax} — midpoints between the clusters.
+function detectThresholds(rawLines, pageWidth) {
+  const xCounts={};
+  for(const row of rawLines){
+    if(!(row.str||'').trim()) continue;
+    const xr=Math.round(row.x/3)*3; // snap to 3pt grid
+    xCounts[xr]=(xCounts[xr]||0)+1;
+  }
+  // Filter noise, merge nearby clusters
+  const clusters=Object.entries(xCounts)
+    .filter(([,c])=>c>=2)
+    .map(([x])=>parseFloat(x))
+    .sort((a,b)=>a-b);
+  
+  const merged=[];
+  for(const x of clusters){
+    if(merged.length&&x-merged[merged.length-1]<12) continue; // merge close values
+    merged.push(x);
+  }
+  
+  // Split into body (action/dialogue/character) and transition (rightmost, >60% of width)
+  const body=merged.filter(x=>x/pageWidth<0.60);
+  
+  // We need at least action + dialogue + character = 3 clusters
+  // If we have fewer, use percentage-based fallback
+  if(body.length<2){
+    return{actionMax:pageWidth*0.22,dialogueMax:pageWidth*0.36};
+  }
+  
+  const midpoint=(a,b)=>(a+b)/2;
+  return{
+    actionMax:  body.length>=2 ? midpoint(body[0],body[1]) : pageWidth*0.22,
+    dialogueMax:body.length>=3 ? midpoint(body[1],body[2]) : pageWidth*0.36,
+  };
 }
 
-// Detect qualifier: (V.O.), (O.S.), (CONT'D) etc. — standalone on own line
-const QUALIFIER_RE = /^\(\s*(V\.?O\.?|O\.?S\.?|CONT'?D|VOICE OVER|OFF SCREEN|PRE-LAP|FILTERED|DRUNKENLY|FILTERED)\s*\)$/i;
+// ── CLASSIFY A ROW ───────────────────────────────────────
+function classifyRow(text,x,thresholds){
+  const t=text.trim();
+  if(!t) return 'blank';
+  if(/^\d+$/.test(t)) return 'skip'; // page numbers
+  if(QUALIFIER_RE.test(t)) return 'qualifier';
+  if(TRANS_RE.test(t)) return 'transition';
+  if(t.startsWith('(')&&t.endsWith(')')&&x>thresholds.actionMax) return 'parenthetical';
+  if(x<=thresholds.actionMax){
+    if(SCENE_RE.test(t)) return 'scene';
+    return 'action';
+  }
+  if(x<=thresholds.dialogueMax) return 'dialogue';
+  return 'character';
+}
 
-// Scene heading content check (used for left-band disambiguation)
-const SCENE_RE = /^(\d*\s*)?(INT|EXT|I\/E|EXT\/INT|INT\.\/EXT\.|COLD OPEN|ACT\s+(ONE|TWO|THREE|FOUR|FIVE|\d+)|FADE\s*IN\s*:|TAG|TEASER|EPILOGUE)\b/i;
-
-// Transition content check (used for right-band)
-const TRANS_RE  = /^(FADE\s*(OUT|TO\s*BLACK)|CUT\s*TO|DISSOLVE\s*TO|SMASH\s*CUT|MATCH\s*CUT|WIPE\s*TO|INTERCUT|THE\s*END|BACK\s*TO|WHIP\s*PAN|TITLE\s*CARD|CONTINUOUS|SAME)\s*[.:]?\s*$/i;
-
-// ── GROUP PDF ITEMS INTO VISUAL LINES ────────────────────
-// Preserves the x of the FIRST item on each line (most important for classification)
-function groupRawLines(items, vp) {
-  const sorted = items
-    .filter(i => i.str && i.str.trim())
-    .map(i => ({
-      str: i.str,
-      x:   i.transform[4],
-      y:   vp.height - i.transform[5],
-      pageW: vp.width
-    }))
-    .sort((a, b) => a.y - b.y || a.x - b.x);
-
-  const rows = [];
-  for (const item of sorted) {
-    const last = rows[rows.length - 1];
-    if (last && Math.abs(last.y - item.y) < 6) {
-      // Same visual line — append text, keep original x
-      last.str += item.str;
-    } else {
-      rows.push({ str: item.str, x: item.x, y: item.y, pageW: vp.width });
-    }
+// ── GROUP PDF.JS ITEMS INTO VISUAL LINES ─────────────────
+function groupRawLines(items,vp){
+  const sorted=items
+    .filter(i=>i.str&&i.str.trim())
+    .map(i=>({str:i.str,x:i.transform[4],y:vp.height-i.transform[5],pageW:vp.width}))
+    .sort((a,b)=>a.y-b.y||a.x-b.x);
+  const rows=[];
+  for(const item of sorted){
+    const last=rows[rows.length-1];
+    // Same visual line if y within 6pt; keep x of first item on the line
+    if(last&&Math.abs(last.y-item.y)<6){last.str+=item.str;}
+    else rows.push({...item});
   }
   return rows;
 }
 
-// ── CLASSIFY A SINGLE ROW ────────────────────────────────
-function classifyRow(row, prevType) {
-  const t     = (row.str || '').trim();
-  const xNorm = row.pageW > 0 ? row.x / row.pageW : 0;
-  const band  = xBand(xNorm);
+// ── PARSE ROWS INTO TYPED BLOCKS ─────────────────────────
+function parseIntoBlocks(rawLines,pageWidth){
+  const thresholds=detectThresholds(rawLines,pageWidth);
+  const blocks=[];
+  let prevType='action';
 
-  if (!t) return 'blank';
-
-  // Qualifier line: (V.O.) etc. → merge into previous character name
-  if (QUALIFIER_RE.test(t)) return 'qualifier';
-
-  // Parenthetical: (something) indented
-  if (t.startsWith('(') && t.endsWith(')') && band !== 'left') return 'parenthetical';
-
-  // Right band → transition (verify content just in case)
-  if (band === 'right') return 'transition';
-
-  // Centre band → character name
-  if (band === 'centre') return 'character';
-
-  // Indent band → dialogue
-  if (band === 'indent') return 'dialogue';
-
-  // Left band → action or scene heading
-  // Distinguish by content
-  if (SCENE_RE.test(t)) return 'scene';
-
-  // Everything else at left indent is action
-  return 'action';
-}
-
-// ── PARSE INTO TYPED BLOCKS ──────────────────────────────
-function parseIntoBlocks(rawLines) {
-  const blocks  = [];
-  let prevType  = 'action';
-
-  for (const row of rawLines) {
-    const t = (row.str || '').trim();
-
-    if (!t) {
-      blocks.push({ type: 'blank', text: '' });
-      prevType = 'blank';
+  for(const row of rawLines){
+    const t=(row.str||'').trim();
+    if(!t){
+      // Blank line is a hard reset — always means new paragraph
+      // This correctly separates action after dialogue in standard scripts
+      if(prevType!=='blank') blocks.push({type:'blank',text:''});
+      prevType='blank';
       continue;
     }
 
-    // Skip standalone page/scene numbers
-    if (/^\d+$/.test(t)) continue;
+    const type=classifyRow(t,row.x,thresholds);
+    if(type==='skip') continue;
 
-    const type = classifyRow(row, prevType);
-
-    // Qualifier → append to last character name block
-    if (type === 'qualifier') {
-      const last = blocks[blocks.length - 1];
-      if (last && last.type === 'character') {
-        last.text += ' ' + t;
-      }
-      continue; // don't update prevType
+    // Qualifier → append onto last character block
+    if(type==='qualifier'){
+      const last=blocks[blocks.length-1];
+      if(last&&last.type==='character') last.text+=' '+t;
+      continue;
     }
 
-    // Merge consecutive same-type blocks where sensible
-    // (dialogue lines, action lines, but NOT character/scene/transition)
-    const last = blocks[blocks.length - 1];
-    const canMerge = last && last.type === type
-      && type !== 'scene' && type !== 'transition'
-      && type !== 'character' && type !== 'blank';
+    // Consecutive same-type lines merge (action wraps, dialogue wraps)
+    // but NOT across blank lines (handled above) and NOT scene/transition/character
+    const last=blocks[blocks.length-1];
+    const canMerge=last&&last.type===type
+      &&type!=='scene'&&type!=='transition'&&type!=='character'&&type!=='blank';
 
-    if (canMerge) {
-      last.text += ' ' + t;
-    } else {
-      blocks.push({ type, text: t });
-    }
+    if(canMerge) last.text+=' '+t;
+    else blocks.push({type,text:t});
 
-    prevType = type;
+    prevType=type;
   }
-
   return blocks;
 }
 
-// ── Extract text from text-based PDF ────────────────────
-async function extractText(pdf) {
-  const allRows = [];
-  const n = pdf.numPages;
-  for (let p = 1; p <= n; p++) {
-    logMsg('Reading page ' + p + ' / ' + n);
-    setProg(5 + (p/n) * 40);
-    const page = await pdf.getPage(p);
-    const vp   = page.getViewport({ scale: 1 });
-    const tc   = await page.getTextContent();
-    allRows.push(...groupRawLines(tc.items, vp));
-    allRows.push({ str: '', x: 0, pageW: vp.width });
+// ── EXTRACT TEXT PDF ─────────────────────────────────────
+async function extractPages(pdf){
+  const allRows=[];
+  let pageWidth=612;
+  const n=pdf.numPages;
+  for(let p=1;p<=n;p++){
+    logMsg('Reading page '+p+' / '+n);
+    setProg(5+(p/n)*40);
+    const page=await pdf.getPage(p);
+    const vp=page.getViewport({scale:1});
+    pageWidth=vp.width;
+    const tc=await page.getTextContent();
+    allRows.push(...groupRawLines(tc.items,vp));
+    allRows.push({str:'',x:0,pageW:vp.width}); // page gap = blank line
   }
-  return allRows;
+  return{allRows,pageWidth};
 }
 
-// ── Scanned detection ────────────────────────────────────
-async function isScanned(page) {
-  const tc = await page.getTextContent();
-  return tc.items.map(i=>i.str).join('').trim().length < 30;
+// ── SCANNED DETECTION ────────────────────────────────────
+async function isScanned(page){
+  const tc=await page.getTextContent();
+  return tc.items.map(i=>i.str).join('').trim().length<30;
 }
 
-// ── Page → image ─────────────────────────────────────────
-async function pageToImg(page) {
-  const vp = page.getViewport({ scale: 2 });
-  const c  = document.createElement('canvas');
-  c.width = vp.width; c.height = vp.height;
-  await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-  return c.toDataURL('image/jpeg', 0.92);
+// ── PAGE → IMAGE ─────────────────────────────────────────
+async function pageToImg(page){
+  const vp=page.getViewport({scale:2});
+  const c=document.createElement('canvas');
+  c.width=vp.width;c.height=vp.height;
+  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+  return c.toDataURL('image/jpeg',0.92);
 }
 
-// ── OCR via LM Studio ────────────────────────────────────
-async function ocrPage(imgUrl, p, n) {
-  logMsg('OCR page ' + p + ' / ' + n + '…');
-  const model = lmsModel();
-  if (!model) throw new Error('No vision model set — enter one above.');
-  const res = await fetch(lmsUrl() + '/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model, max_tokens: 2048, temperature: 0,
-      messages: [{ role: 'user', content: [
-        { type: 'image_url', image_url: { url: imgUrl } },
-        { type: 'text', text: 'You are a screenplay OCR engine. Transcribe this screenplay page exactly.\nRules:\n- Output ONLY the text. No commentary, no markdown, no code fences.\n- Preserve ALL line breaks exactly as they appear.\n- Preserve indentation using spaces.\n- Do not add or remove any words.' }
-      ]}]
-    })
+// ── OCR VIA LM STUDIO ────────────────────────────────────
+async function ocrPage(imgUrl,p,n){
+  logMsg('OCR page '+p+' / '+n+'…');
+  const model=lmsModel();
+  if(!model) throw new Error('No vision model set — enter one above.');
+  const res=await fetch(lmsUrl()+'/v1/chat/completions',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model,max_tokens:2048,temperature:0,messages:[{role:'user',content:[
+      {type:'image_url',image_url:{url:imgUrl}},
+      {type:'text',text:'Transcribe this screenplay page exactly. Output ONLY the text, preserving all line breaks and indentation with spaces. No commentary, no markdown.'}
+    ]}]})
   });
-  if (!res.ok) { const e = await res.text(); throw new Error('LM Studio ' + res.status + ': ' + e.slice(0,150)); }
-  return (await res.json()).choices[0].message.content;
+  if(!res.ok){const e=await res.text();throw new Error('LM Studio '+res.status+': '+e.slice(0,150));}
+  return(await res.json()).choices[0].message.content;
 }
 
-// ── Parse OCR text → rows ────────────────────────────────
-function parseOcr(text) {
-  return text.split('\n').map(raw => {
-    const t = raw.trimEnd();
-    if (!t.trim()) return { str: '', x: 0, pageW: 612 };
-    const spaces = t.length - t.trimStart().length;
-    return { str: t.trimStart(), x: spaces * 7.2, pageW: 612 };
+// ── PARSE OCR TEXT → ROWS ────────────────────────────────
+// For OCR output we estimate x from leading spaces.
+// Standard Courier 12pt ≈ 7.2pt/char. Page width 612pt.
+function parseOcrRows(text,pageWidth){
+  return text.split('\n').map(raw=>{
+    const t=raw.trimEnd();
+    if(!t.trim()) return{str:'',x:0,pageW:pageWidth};
+    const spaces=t.length-t.trimStart().length;
+    return{str:t.trimStart(),x:spaces*7.2,pageW:pageWidth};
   });
 }
 
-// ── Build output PDF ─────────────────────────────────────
-function buildPDF(blocks, fontSize, pageSizeKey, lineSpacing) {
-  const [pageW, pageH] = PAGE_SIZES[pageSizeKey];
-  const mX = pageSizeKey === 'kindle' ? 24 : 42;
-  const mY = pageSizeKey === 'kindle' ? 28 : 48;
-  const cW = pageW - mX * 2;
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'pt', format: [pageW, pageH] });
+// ── BUILD OUTPUT PDF ─────────────────────────────────────
+function buildPDF(blocks,fontSize,pageSizeKey,lineSpacing){
+  const[pageW,pageH]=PAGE_SIZES[pageSizeKey];
+  const mX=pageSizeKey==='kindle'?24:42;
+  const mY=pageSizeKey==='kindle'?28:48;
+  const cW=pageW-mX*2;
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'pt',format:[pageW,pageH]});
 
-  // Standard screenplay proportions, scaled to our page width
+  // Standard screenplay column layout scaled to our output page:
   // Action: full width, flush left
-  // Character: centred (starts at ~37% in)
-  // Dialogue: starts at ~20%, ends at ~80% (60% wide)
-  // Parenthetical: starts at ~30%, ends at ~70%
+  // Dialogue: 60% wide, 15% indent
+  // Character: starts at 30%, narrow enough for names
+  // Parenthetical: starts at 22%, 36% wide
   // Transition: right-aligned
-  const ST = {
-    scene:        { size: fontSize,    bold: true,  x: 0,        w: cW,        align: 'left'  },
-    character:    { size: fontSize,    bold: true,  x: cW*0.30,  w: cW*0.40,   align: 'left'  },
-    parenthetical:{ size: fontSize-1, bold: false, x: cW*0.22,  w: cW*0.36,   align: 'left',  r:80,g:80,b:80 },
-    dialogue:     { size: fontSize,    bold: false, x: cW*0.15,  w: cW*0.70,   align: 'left'  },
-    transition:   { size: fontSize-1, bold: false, x: 0,        w: cW,        align: 'right', r:80,g:80,b:80 },
-    action:       { size: fontSize,    bold: false, x: 0,        w: cW,        align: 'left'  },
+  const ST={
+    scene:        {size:fontSize,   bold:true, x:0,       w:cW,       align:'left'},
+    action:       {size:fontSize,   bold:false,x:0,       w:cW,       align:'left'},
+    character:    {size:fontSize,   bold:true, x:cW*0.30, w:cW*0.40,  align:'left'},
+    parenthetical:{size:fontSize-1,bold:false,x:cW*0.22, w:cW*0.36,  align:'left', gray:true},
+    dialogue:     {size:fontSize,   bold:false,x:cW*0.15, w:cW*0.70,  align:'left'},
+    transition:   {size:fontSize-1,bold:false,x:0,       w:cW,       align:'right',gray:true},
   };
 
-  let curY = mY + fontSize;
-  function newPage() { doc.addPage(); curY = mY + fontSize; }
+  let curY=mY+fontSize;
+  function newPage(){doc.addPage();curY=mY+fontSize;}
 
-  function putBlock(text, type) {
-    const s = ST[type] || ST.action;
+  function putBlock(text,type){
+    const s=ST[type]||ST.action;
     doc.setFontSize(s.size);
-    doc.setFont('Courier', s.bold ? 'bold' : 'normal');
-    doc.setTextColor(s.r||0, s.g||0, s.b||0);
-    const lineH = s.size * lineSpacing;
-    const wrapped = doc.splitTextToSize(text, s.w);
-    for (const ln of wrapped) {
-      if (curY > pageH - mY) newPage();
-      const x = s.align === 'right' ? mX + cW - doc.getTextWidth(ln) : mX + s.x;
-      doc.text(ln, x, curY);
-      curY += lineH;
+    doc.setFont('Courier',s.bold?'bold':'normal');
+    doc.setTextColor(s.gray?80:0,s.gray?80:0,s.gray?80:0);
+    const lineH=s.size*lineSpacing;
+    for(const ln of doc.splitTextToSize(text,s.w)){
+      if(curY>pageH-mY) newPage();
+      const xPos=s.align==='right'?mX+cW-doc.getTextWidth(ln):mX+s.x;
+      doc.text(ln,xPos,curY);
+      curY+=lineH;
     }
   }
 
-  let lastType = null;
-  let blankCount = 0;
-
-  for (const block of blocks) {
-    const { type, text } = block;
-
-    if (type === 'blank') {
+  let lastType=null,blankCount=0;
+  for(const block of blocks){
+    const{type,text}=block;
+    if(type==='blank'){
       blankCount++;
-      // Only add vertical space for first blank after content
-      if (blankCount === 1 && lastType && lastType !== 'blank') {
-        curY += fontSize * 0.4;
-      }
+      if(blankCount===1&&lastType&&lastType!=='blank') curY+=fontSize*0.4;
       continue;
     }
-    blankCount = 0;
+    blankCount=0;
 
-    // Pre-block spacing
-    if (lastType !== null && lastType !== 'blank') {
-      if (type === 'scene') {
-        curY += fontSize * 1.8; // big gap before scene headings
-      } else if (type === 'character' && (lastType === 'action' || lastType === 'transition' || lastType === 'scene')) {
-        curY += fontSize * 1.0; // gap before character names when coming from action
-      } else if (type === 'action' && (lastType === 'dialogue' || lastType === 'parenthetical')) {
-        curY += fontSize * 0.6; // gap after dialogue block ends
-      } else if (type === 'transition') {
-        curY += fontSize * 0.8;
-      }
-      // No extra gap between character→dialogue, dialogue→parenthetical, parenthetical→dialogue
+    // Inter-block spacing
+    if(lastType&&lastType!=='blank'){
+      if(type==='scene')                                        curY+=fontSize*1.8;
+      else if(type==='character'&&(lastType==='action'||lastType==='transition'||lastType==='scene')) curY+=fontSize*1.0;
+      else if(type==='action'&&(lastType==='dialogue'||lastType==='parenthetical'))                   curY+=fontSize*0.6;
+      else if(type==='transition')                              curY+=fontSize*0.8;
+      // No gap: character→dialogue, dialogue→parenthetical, parenthetical→dialogue
     }
 
-    if (text.trim()) putBlock(text.trim(), type);
-    lastType = type;
+    if(text.trim()) putBlock(text.trim(),type);
+    lastType=type;
   }
-
   return doc;
 }
 
-// ── Main ─────────────────────────────────────────────────
-async function go() {
-  if (!pdfFile) return;
-  const btn = document.getElementById('go-btn');
-  btn.disabled = true;
-  document.getElementById('dl-btn').style.display = 'none';
+// ── MAIN ─────────────────────────────────────────────────
+async function go(){
+  if(!pdfFile) return;
+  const btn=document.getElementById('go-btn');
+  btn.disabled=true;
+  document.getElementById('dl-btn').style.display='none';
   clearLog();
 
-  const fontSize    = parseInt(document.getElementById('s-size').value);
-  const pageSizeKey = document.getElementById('s-page').value;
-  const lineSpacing = parseFloat(document.getElementById('s-space').value);
-  const smartFormat = document.getElementById('s-smart').checked;
-  const useOCR      = document.getElementById('s-ocr').checked;
+  const fontSize   =parseInt(document.getElementById('s-size').value);
+  const pageSizeKey=document.getElementById('s-page').value;
+  const lineSpacing=parseFloat(document.getElementById('s-space').value);
+  const useOCR     =document.getElementById('s-ocr').checked;
 
-  try {
-    logMsg('Loading PDF…'); setProg(2);
-    const pdf = await pdfjsLib.getDocument({ data: await pdfFile.arrayBuffer() }).promise;
-    const n   = pdf.numPages;
+  try{
+    logMsg('Loading PDF…');setProg(2);
+    const pdf=await pdfjsLib.getDocument({data:await pdfFile.arrayBuffer()}).promise;
+    const n=pdf.numPages;
 
-    // Quick scanned check
-    const p1 = await pdf.getPage(1);
-    if ((await p1.getTextContent()).items.map(i=>i.str).join('').trim().length < 50 && !useOCR) {
-      logMsg('This looks like a scanned PDF — enable OCR mode and try again.', 'hi');
-      document.getElementById('s-ocr').checked = true;
-      btn.disabled = false;
+    // Quick scanned check on page 1
+    const p1=await pdf.getPage(1);
+    if((await p1.getTextContent()).items.map(i=>i.str).join('').trim().length<50&&!useOCR){
+      logMsg('Looks like a scanned PDF — enable OCR mode and try again.','hi');
+      document.getElementById('s-ocr').checked=true;
+      btn.disabled=false;
       return;
     }
 
-    logMsg('Found ' + n + ' page' + (n!==1?'s':'') + '.');
-    let allRows = [];
+    logMsg('Found '+n+' page'+(n!==1?'s':'')+'.');
+    let allRows=[],pageWidth=612;
 
-    if (useOCR) {
-      if (!lmsModel()) throw new Error('No vision model set — enter one above.');
-      for (let p = 1; p <= n; p++) {
-        setProg(5 + (p/n)*82);
-        const page = await pdf.getPage(p);
-        if (await isScanned(page)) {
-          allRows = allRows.concat(parseOcr(await ocrPage(await pageToImg(page), p, n)));
-        } else {
-          logMsg('Page ' + p + '/' + n + ' — text…');
-          const vp = page.getViewport({ scale: 1 });
-          const tc = await page.getTextContent();
-          allRows = allRows.concat(groupRawLines(tc.items, vp));
+    if(useOCR){
+      if(!lmsModel()) throw new Error('No vision model set — enter one above.');
+      for(let p=1;p<=n;p++){
+        setProg(5+(p/n)*82);
+        const page=await pdf.getPage(p);
+        const vp=page.getViewport({scale:1});
+        pageWidth=vp.width;
+        if(await isScanned(page)){
+          allRows=allRows.concat(parseOcrRows(await ocrPage(await pageToImg(page),p,n),pageWidth));
+        }else{
+          logMsg('Page '+p+'/'+n+' — text…');
+          const tc=await page.getTextContent();
+          allRows=allRows.concat(groupRawLines(tc.items,vp));
         }
-        allRows.push({ str: '', x: 0, pageW: 612 });
+        allRows.push({str:'',x:0,pageW:pageWidth});
       }
-    } else {
-      allRows = await extractText(pdf);
+    }else{
+      const result=await extractPages(pdf);
+      allRows=result.allRows;
+      pageWidth=result.pageWidth;
     }
 
-    logMsg('Parsing structure…'); setProg(88);
-    const blocks = smartFormat ? parseIntoBlocks(allRows) : allRows.map(r => ({ type: r.str.trim() ? 'action' : 'blank', text: r.str.trim() }));
+    logMsg('Parsing…');setProg(88);
+    const blocks=parseIntoBlocks(allRows,pageWidth);
 
-    logMsg('Building PDF…'); setProg(93);
-    const doc  = buildPDF(blocks, fontSize, pageSizeKey, lineSpacing);
-    outBlob    = doc.output('blob');
-    const name = pdfFile.name.replace(/\.pdf$/i, '') + '_kindle.pdf';
+    logMsg('Building PDF…');setProg(93);
+    const doc=buildPDF(blocks,fontSize,pageSizeKey,lineSpacing);
+    outBlob=doc.output('blob');
+    const name=pdfFile.name.replace(/\.pdf$/i,'')+'_kindle.pdf';
 
-    const dlBtn = document.getElementById('dl-btn');
-    dlBtn.style.display = 'block';
-    dlBtn.textContent   = '⬇  Download — ' + name;
-    dlBtn.onclick = () => {
-      const url = URL.createObjectURL(outBlob);
-      const a = document.createElement('a'); a.href=url; a.download=name; a.click();
+    const dlBtn=document.getElementById('dl-btn');
+    dlBtn.style.display='block';
+    dlBtn.textContent='⬇  Download — '+name;
+    dlBtn.onclick=()=>{
+      const url=URL.createObjectURL(outBlob);
+      const a=document.createElement('a');a.href=url;a.download=name;a.click();
       URL.revokeObjectURL(url);
     };
     setProg(100);
-    logMsg('Done — ' + doc.getNumberOfPages() + ' pages.', 'ok');
-  } catch(err) {
-    logMsg(err.message, 'er');
+    logMsg('Done — '+doc.getNumberOfPages()+' pages.','ok');
+  }catch(err){
+    logMsg(err.message,'er');
     console.error(err);
   }
-  btn.disabled = false;
+  btn.disabled=false;
 }
 </script>
 </body>
