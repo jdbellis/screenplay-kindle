@@ -278,19 +278,50 @@ function classifyRow(text,x,thresholds){
 }
 
 // ── GROUP PDF.JS ITEMS INTO VISUAL LINES ─────────────────
+// PDF.js gives text chunks without guaranteed spaces between them.
+// We reconstruct spaces by checking the gap between chunk end and next chunk start.
 function groupRawLines(items,vp){
   const sorted=items
-    .filter(i=>i.str&&i.str.trim())
-    .map(i=>({str:i.str,x:i.transform[4],y:vp.height-i.transform[5],pageW:vp.width}))
+    .filter(i=>i.str!=null&&i.str!=='')
+    .map(i=>({
+      str:i.str,
+      x:i.transform[4],
+      y:vp.height-i.transform[5],
+      // item.width is the rendered width of the chunk in user units
+      w:i.width||0,
+      fs:Math.abs(i.transform[0])||12,
+      pageW:vp.width
+    }))
     .sort((a,b)=>a.y-b.y||a.x-b.x);
+
   const rows=[];
   for(const item of sorted){
     const last=rows[rows.length-1];
-    // Same visual line if y within 6pt; keep x of first item on the line
-    if(last&&Math.abs(last.y-item.y)<6){last.str+=item.str;}
-    else rows.push({...item});
+    if(last&&Math.abs(last.y-item.y)<6){
+      // Same visual line. Decide whether a space belongs between the chunks.
+      // Gap = distance from end of last chunk to start of this one.
+      const lastEndX=last.x+last.w;
+      const gap=item.x-lastEndX;
+      // Space threshold: ~40% of an average character width
+      const charW=(item.fs||12)*0.5;
+      // Also treat as needing space if the item itself starts with space
+      // or if PDF.js gave us a pure space item (common separator)
+      const itemStr=item.str;
+      if(gap>charW*0.4||itemStr===' '||itemStr.startsWith(' ')||last.str.endsWith(' ')){
+        if(itemStr.trim()) last.str+=' '+itemStr.trim();
+      } else {
+        last.str+=item.str;
+      }
+      // Expand the bounding width of this row
+      last.w=(item.x+item.w)-last.x;
+    } else {
+      rows.push({str:item.str,x:item.x,y:item.y,w:item.w,fs:item.fs,pageW:vp.width});
+    }
   }
-  return rows;
+  // Normalise spacing and drop empty rows
+  return rows
+    .map(r=>({...r,str:r.str.replace(/  +/g,' ').trim()}))
+    .filter(r=>r.str);
 }
 
 // ── PARSE ROWS INTO TYPED BLOCKS ─────────────────────────
